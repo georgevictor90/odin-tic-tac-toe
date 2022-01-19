@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic-Tac-Toe</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <h1>Tic Tac Toe</h1>
+
+  <div id="playerModule">
+
+    <div id="newGameForm">
+      <div id="chooseMode">
+        <p>Select game mode:</p>
+        <div>
+          <div>
+            <input type="radio" name="mode" id="vsComputer" value="1">
+            <label for="vsComputer">vs Computer</label>
+          </div>
+          <div>
+            <input type="radio" name="mode" id="vsPlayer" value="2">
+            <label for="vsPlayer">vs Player</label>
+          </div>
+        </div>
+      </div>
+  
+      <div id="vsComputerForm" class="hidden playerInput">
+        <div>
+          <label for="playerName">Player Name:</label>
+          <input type="text" name="playerName" id="playerName" placeholder="Name">
+        </div>
+        
+        <div id="playerMark" class="chooseMark">
+          <p>Choose player mark:</p>
+          <div>
+            <div>
+              <input type="radio" name="mark" id="X" value="X">
+              <label for="X">X</label>
+            </div>
+            <div>
+              <input type="radio" name="mark" id="O" value="O">
+              <label for="O">O</label>
+            </div>
+          </div>          
+        </div>
+      </div>
+  
+      <div id="vsPlayerForm" class="hidden playerInput">
+        <div>
+          <label for="player1Name">Player1 Name:</label>
+          <input type="text" name="playerName" id="player1Name" placeholder="Name">
+        </div>
+
+        <div id="player1Mark" class="chooseMark">
+          <p>Choose mark for Player1:</p>
+          <div>
+            <div>
+              <input type="radio" name="mark" id="p1-X" value="X">
+              <label for="X">X</label>
+            </div>
+            <div>
+              <input type="radio" name="mark" id="p1-O" value="O">
+              <label for="O">O</label>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label for="player2Name">Player2 Name:</label>
+          <input type="text" name="playerName" id="player2Name" placeholder="Name">
+        </div>
+      
+        <div id="player2Mark" class="chooseMark">
+          <p>Mark for Player2: </p>
+        </div>
+      </div>
+  
+      <button id="newGameBtn">New Game</button>
+    </div>
+  
+    <div id="playerInfoDiv">
+      <div class="playerInfo" id="player1Info">
+        <p>Player1 Name: </p>
+        <p>Player1 Score: </p>
+      </div>
+  
+      <div class="playerInfo" id="player2Info">
+        <p>Player2 Name: </p>
+        <p>Player2 Score: </p>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="gameBoard">
+    <div class="gridTile"></div>
+    <div class="gridTile"></div>
+    <div class="gridTile"></div>
+    <div class="gridTile"></div>
+    <div class="gridTile"></div>
+    <div class="gridTile"></div>
+    <div class="gridTile"></div>
+    <div class="gridTile"></div>
+    <div class="gridTile"></div>
+  </div>
+
+</body>
+</html>
