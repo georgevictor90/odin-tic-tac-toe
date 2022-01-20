@@ -26,6 +26,13 @@ const game = (() => {
     return gameMode
   }
 
+  let markSpace = (e) => {
+    
+    let index = gameBoard.gridTiles.indexOf(e.target);
+    gameBoard.gameBoardArr[index] = 'bang!';
+    gameBoard.render()
+    
+  }
 
   document.getElementById('chooseMode').addEventListener('click', setGameMode)
 
@@ -56,24 +63,34 @@ const game = (() => {
     console.log('player2Mark is ' + player2Mark);
   })
 
+  return {
+    setGameMode,
+    markSpace,
+  }
 
 })()
 
 
 const gameBoard = (() => {
-  let gameBoardArr = ["", "X", "", "O", "", "", "X", "", ""];
+
+  let gameBoardArr = ["", "", "", "O", "", "", "", "", ""];
   const gridTiles = Array.from(document.getElementsByClassName('gridTile'));
+  const grid = document.getElementById('gameBoard');
 
   const render = function() {
     for (let i = 0; i < gridTiles.length; i++) {
       gridTiles[i].textContent = gameBoardArr[i]
     }
-    return gridTiles;
+    return gridTiles
   }
+
+  grid.addEventListener('click', game.markSpace);
+
 
   return {
     gameBoardArr,
     gridTiles,
+    grid,
     render,
   }
 })()
