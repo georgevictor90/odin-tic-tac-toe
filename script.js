@@ -1,19 +1,22 @@
 const game = (() => {
   let gameMode;
   let currentPlayer;
-  let playerName; 
+  let playerName;
   let playerMark;
   let player1Name;
   let player2Name;
   let player1Mark;
   let player2Mark;
+  let index;
+  let gameIsOver = false;
+  let isArrayFull;
 
   const player = (name, mark) => {
     this.name = name;
     this.mark = mark;
     let currentPlayer
     return {
-      name, 
+      name,
       mark,
       currentPlayer: currentPlayer,
     }
@@ -24,8 +27,7 @@ const game = (() => {
   const newGameBtn = document.getElementById('newGameBtn');
   const newGameForm = document.getElementById('newGameForm');
   const displayWinner = document.getElementById('displayWinner');
-  let isArrayFull;
-  
+
 
   const setGameMode = () => {
     if (document.getElementById('vsComputer').checked) {
@@ -47,7 +49,7 @@ const game = (() => {
   }
 
   const getMark1 = () => {
-    if ( (!document.getElementById('X').checked) && (!document.getElementById('O').checked) ) return
+    if ((!document.getElementById('X').checked) && (!document.getElementById('O').checked)) return
 
     if (document.getElementById('X').checked) {
       playerMark = "X"
@@ -58,7 +60,7 @@ const game = (() => {
   }
 
   const getMark2 = () => {
-    if ( (!document.getElementById('p1-X').checked) && (!document.getElementById('p1-O').checked) ) return
+    if ((!document.getElementById('p1-X').checked) && (!document.getElementById('p1-O').checked)) return
 
     if (document.getElementById('p1-X').checked) {
       player1Mark = "X";
@@ -69,7 +71,7 @@ const game = (() => {
       player2Mark = "X"
     }
   }
-  
+
 
   const getPlayerNames = () => {
     if (gameMode === 2) {
@@ -80,7 +82,7 @@ const game = (() => {
       player1Name = document.getElementById('playerName').value;
       player2Name = 'Computer';
     }
-    
+
   }
 
   const createNewPlayers = () => {
@@ -94,12 +96,10 @@ const game = (() => {
     if (player1.mark === 'X') {
       player1.currentPlayer = 'true';
       player2.currentPlayer = 'false';
-      console.log('current player is player1');
 
     } else if (player2.mark === 'X') {
       player2.currentPlayer = 'true';
       player1.currentPlayer = 'false';
-      console.log('current player is player1');
     }
 
 
@@ -109,17 +109,17 @@ const game = (() => {
     if (player1.currentPlayer === 'true' && player2.currentPlayer === 'false') {
       player1.currentPlayer = 'false';
       player2.currentPlayer = 'true';
-      console.log('AFTER SWITCH: current player is player2');
 
-    }else if (player1.currentPlayer === 'false' && player2.currentPlayer === 'true') {
+    } else if (player1.currentPlayer === 'false' && player2.currentPlayer === 'true') {
       player1.currentPlayer = 'true';
       player2.currentPlayer = 'false';
-      console.log('AFTER SWITCH: current player is player1');
     }
   }
 
+  const getGameIsOver = () => gameIsOver;
+
   const markSpace = (e) => {
-    let index = gameBoard.gridTiles.indexOf(e.target);
+    index = gameBoard.gridTiles.indexOf(e.target);
     if (!(gameBoard.gameBoardArr[index] === '')) return
     if (player1.currentPlayer === 'true') {
       gameBoard.gameBoardArr[index] = player1.mark;
@@ -130,136 +130,99 @@ const game = (() => {
     gameBoard.render();
     switchCurrentPlayer();
 
-    isArrayFull = gameBoard.gameBoardArr.every(element => element !== '')
-    console.log(isArrayFull)
+    isArrayFull = gameBoard.gameBoardArr.every(element => element !== '');
 
     checkForWin()
   }
 
   const checkForWin = () => {
-    console.log('fired check for win')
     checkRows();
     checkColumns();
     checkDiagonals();
+    checkDraw();
+    console.log(gameIsOver);
   }
 
   const checkRows = () => {
-    console.log('fired check rows')
     if (
       ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[1]) && (gameBoard.gameBoardArr[1] === gameBoard.gameBoardArr[2]) && (gameBoard.gameBoardArr[2] === 'X')) ||
-  
+
       ((gameBoard.gameBoardArr[3] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[5]) && (gameBoard.gameBoardArr[5] === 'X')) ||
-  
-      ((gameBoard.gameBoardArr[6] === gameBoard.gameBoardArr[7]) && (gameBoard.gameBoardArr[7] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'X')) ) {
-      console.log('ROWS X')
-      declareWinner('X')
-  
+
+      ((gameBoard.gameBoardArr[6] === gameBoard.gameBoardArr[7]) && (gameBoard.gameBoardArr[7] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'X'))) {
+      gameIsOver = true;
+      declareWinner('X');
+
     } else if (
       ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[1]) && (gameBoard.gameBoardArr[1] === gameBoard.gameBoardArr[2]) && (gameBoard.gameBoardArr[2] === 'O')) ||
-  
+
       ((gameBoard.gameBoardArr[3] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[5]) && (gameBoard.gameBoardArr[5] === 'O')) ||
-  
-      ((gameBoard.gameBoardArr[6] === gameBoard.gameBoardArr[7]) && (gameBoard.gameBoardArr[7] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'O')) ) {
-      console.log('ROWS O')
-      declareWinner('O')
-      
+
+      ((gameBoard.gameBoardArr[6] === gameBoard.gameBoardArr[7]) && (gameBoard.gameBoardArr[7] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'O'))) {
+      gameIsOver = true;
+      declareWinner('O');
+
     } else return
   }
 
-  // const checkRows = () => {
-  //   console.log('fired check rows')
-  //   if (
-  //     gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[1] === gameBoard.gameBoardArr[2] === 'X' ||
-  //     gameBoard.gameBoardArr[3] === gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[5] === 'X' ||
-  //     gameBoard.gameBoardArr[6] === gameBoard.gameBoardArr[7] === gameBoard.gameBoardArr[8] === 'X') {
-  //     console.log('ROWS X')
-  //     declareWinner('X')
-  //   } else if (
-  //     gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[1] === gameBoard.gameBoardArr[2] === 'O' ||
-  //     gameBoard.gameBoardArr[3] === gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[5] === 'O' ||
-  //     gameBoard.gameBoardArr[6] === gameBoard.gameBoardArr[7] === gameBoard.gameBoardArr[8] === 'O') {
-  //     console.log('ROWS O')
-  //     declareWinner('O')
-  //   } else return
-  // }
+
 
   const checkColumns = () => {
-    console.log('fired check columns')
     if (
       ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[3]) && (gameBoard.gameBoardArr[3] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'X')) ||
-  
+
       ((gameBoard.gameBoardArr[1] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[7]) && (gameBoard.gameBoardArr[7] === 'X')) ||
-  
-      ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[5]) && (gameBoard.gameBoardArr[5] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'X')) ) {
-      console.log('COLUMNS X')
-      declareWinner('X')
-  
+
+      ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[5]) && (gameBoard.gameBoardArr[5] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'X'))) {
+      gameIsOver = true;
+      declareWinner('X');
+
     } else if (
       ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[3]) && (gameBoard.gameBoardArr[3] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'O')) ||
-  
+
       ((gameBoard.gameBoardArr[1] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[7]) && (gameBoard.gameBoardArr[7] === 'O')) ||
-  
-      ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[5]) && (gameBoard.gameBoardArr[5] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'O')) ) {
-      console.log('COLUMNS O')
-      declareWinner('O')
-  
+
+      ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[5]) && (gameBoard.gameBoardArr[5] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'O'))) {
+      gameIsOver = true;
+      declareWinner('O');
+
     } else return
   }
 
-  // const checkColumns = () => {
-  //   console.log('fired check columns')
-  //   if (
-  //     gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[3] === gameBoard.gameBoardArr[6] === 'X' ||
-  //     gameBoard.gameBoardArr[1] === gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[7] === 'X' ||
-  //     gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[5] === gameBoard.gameBoardArr[8] === 'X') {
-  //     console.log('COLUMNS X')
-  //     declareWinner('X')
 
-  //   } else if (
-  //     gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[3] === gameBoard.gameBoardArr[6] === 'O' ||
-  //     gameBoard.gameBoardArr[1] === gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[7] === 'O' ||
-  //     gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[5] === gameBoard.gameBoardArr[8] === 'O') {
-  //     console.log('COLUMNS O')
-  //     declareWinner('O')
-
-  //   } else return
-  // }
 
   const checkDiagonals = () => {
-    console.log('fired check diagonals')
     if (
       ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'X')) ||
-  
-      ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'X')) ) {
-      console.log('DIAGONAL X')
-      declareWinner('X')
-  
+
+      ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'X'))) {
+      gameIsOver = true;
+      declareWinner('X');
+
     } else if (
       ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'O')) ||
-  
-      ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'O')) ) {
-      console.log('DIAGONAL O')
-      declareWinner('O')
-  
+
+      ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'O'))) {
+      gameIsOver = true;
+      declareWinner('O');
+
     } else return
   }
 
-  // const checkDiagonals = () => {
-  //   console.log('fired check diagonals')
-  //   if (
-  //     gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[8] === 'X' ||
-  //     gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[6] === 'X') {
-  //     console.log('DIAGONAL X')
-  //     declareWinner('X')
+  const checkDraw = () => {
+    if (gameIsOver === false && isArrayFull === true) {
+      gameIsOver = true;
+      declareDraw();
+    }
+  }
 
-  //   } else if (
-  //     gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[8] === 'O' ||
-  //     gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[6] === 'O') {
-  //     console.log('DIAGONAL O')
-  //     declareWinner('O')
+  const declareDraw = () => {
+    displayWinner.textContent = "It's a draw!";
+    displayWinner.classList.add('visible');
+    displayWinner.classList.remove('hidden');
+  }
 
-  //   } else return
-  // }
+
 
   const declareWinner = (mark) => {
     if (player1.mark === mark) {
@@ -271,6 +234,11 @@ const game = (() => {
     displayWinner.classList.remove('hidden');
   }
 
+  const startNewRound = () => {
+    gameIsOver = false;
+    gameBoard.gameBoardArr = gameBoard.gameBoardArr.map((elem, ind) => gameBoard.gameBoardArr[ind] = '')
+    gameBoard.render();
+  }
 
   document.getElementById('chooseMode').addEventListener('click', setGameMode)
 
@@ -284,9 +252,21 @@ const game = (() => {
     setCurrentPlayer();
   })
 
+  const playGame = (e) => {
+    console.log('fired playgame');
+    if (gameIsOver === true) {
+      startNewRound();
+    } else {
+      markSpace(e);
+    }
+  }
+
   return {
     markSpace,
     switchCurrentPlayer,
+    startNewRound,
+    getGameIsOver,
+    playGame,
   }
 
 
@@ -296,18 +276,20 @@ const game = (() => {
 const gameBoard = (() => {
 
   let gameBoardArr = ["", "", "", "", "", "", "", "", ""];
-  const gridTiles = Array.from(document.getElementsByClassName('gridTile'));
-  const grid = document.getElementById('gameBoard');
+  let gridTiles = Array.from(document.getElementsByClassName('gridTile'));
+  let grid = document.getElementById('gameBoard');
 
-  const render = function() {
+  const render = function () {
     for (let i = 0; i < gridTiles.length; i++) {
-      gridTiles[i].textContent = gameBoardArr[i]
+      console.log(gameBoardArr);
+      gridTiles[i].textContent = gameBoardArr[i];
     }
+    console.table(gridTiles);
     return gridTiles
   }
 
-  
-  grid.addEventListener('click', game.markSpace);
+
+  grid.addEventListener('click', game.playGame);
 
 
   return {
@@ -318,26 +300,5 @@ const gameBoard = (() => {
   }
 })()
 
-// const player = (name, mark) => {
-//   this.name = name;
-//   this.mark = mark;
-//   let currentPlayer
-//   return {
-//     name, 
-//     mark,
-//     currentPlayer: currentPlayer,
-//   }
-// }
-
-
-
-
-// document.getElementById(newGameBtn).addEventListener('click', () => {
-//   if (gameMode === 1) {
-//     playerName = document.getElementById('playerName').value;
-//     playerMark = document.getElementById('playerName').value;
-//     let player = 
-//   }
-// })
 
 
