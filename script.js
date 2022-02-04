@@ -10,10 +10,16 @@ const game = (() => {
   let index;
   let gameIsOver = false;
   let isArrayFull;
+  let player1Score = 0;
+  let player2Score = 0;
 
   // GRAB DOM ELEMENTS
   const newGameBtn = document.getElementById('newGameBtn');
   const displayWinner = document.getElementById('displayWinner');
+  const p1NameInfo = document.getElementById('p1Name');
+  const p2NameInfo = document.getElementById('p2Name');
+  const p1ScoreInfo = document.getElementById('p1Score');
+  const p2ScoreInfo = document.getElementById('p2Score');
 
   // PLAYER OBJECT FACTORY FUNCTION
   const player = (name, mark) => {
@@ -95,6 +101,24 @@ const game = (() => {
     player2.mark = player2Mark;
   }
 
+  //DISPLAYS THE PLAYER NAMES IN THE PLAYERINFO DIV
+  const displayPlayerNames = () => {
+    p1NameInfo.textContent = `Player1 Name: ${player1Name.toUpperCase()}`;
+    p2NameInfo.textContent = `Player2 Name: ${player2Name.toUpperCase()}`;
+  }
+
+  //DISPLAYS SCORES IN PLAYERINFO DIV
+  const displayScores = () => {
+    p1ScoreInfo.textContent = `Player1 Score: ${player1Score}`;
+    p2ScoreInfo.textContent = `Player2 Score: ${player2Score}`;
+  }
+
+  //DISPLAY PLAYER NAMES AND SCORES
+  const displayInfo = () => {
+    displayPlayerNames();
+    displayScores();
+  }
+
   //SETS THE CURRENT PLAYER FOR THE FIRST MOVE BASED ON MARK (x starts first)
   const setCurrentPlayer = () => {
     if (player1.mark === 'X') {
@@ -151,6 +175,7 @@ const game = (() => {
     checkColumns();
     checkDiagonals();
     checkDraw();
+    displayScores();
   }
 
   // CHECKS FOR THREE IDENTICAL MARKS ON GRID ROWS
@@ -163,6 +188,7 @@ const game = (() => {
       ((gameBoard.gameBoardArr[6] === gameBoard.gameBoardArr[7]) && (gameBoard.gameBoardArr[7] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'X'))) {
       gameIsOver = true;
       declareWinner('X');
+      player1Score++;
       return
 
     } else if (
@@ -173,6 +199,7 @@ const game = (() => {
       ((gameBoard.gameBoardArr[6] === gameBoard.gameBoardArr[7]) && (gameBoard.gameBoardArr[7] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'O'))) {
       gameIsOver = true;
       declareWinner('O');
+      player2Score++;
       return
 
     } else return
@@ -189,6 +216,7 @@ const game = (() => {
       ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[5]) && (gameBoard.gameBoardArr[5] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'X'))) {
       gameIsOver = true;
       declareWinner('X');
+      player1Score++;
       return
 
     } else if (
@@ -199,6 +227,7 @@ const game = (() => {
       ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[5]) && (gameBoard.gameBoardArr[5] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'O'))) {
       gameIsOver = true;
       declareWinner('O');
+      player2Score++;
       return
 
     } else return
@@ -213,6 +242,7 @@ const game = (() => {
       ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'X'))) {
       gameIsOver = true;
       declareWinner('X');
+      player1Score++;
       return
 
     } else if (
@@ -221,6 +251,7 @@ const game = (() => {
       ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'O'))) {
       gameIsOver = true;
       declareWinner('O');
+      player2Score++;
       return
 
     } else return
@@ -252,6 +283,7 @@ const game = (() => {
     displayWinner.classList.add('visible');
     displayWinner.classList.remove('hidden');
   }
+  
 
   // CLEARS THE GRID AND STARTS NEW ROUND
   const startNewRound = () => {
@@ -268,6 +300,8 @@ const game = (() => {
     if (gameIsOver === true) {
       console.log('playGame if --> gameIsOver = true, startNewRound, markSpace(e)')
       startNewRound();
+      displayWinner.classList.remove('visible');
+      displayWinner.classList.add('hidden');
     } else {
       console.log('playGame else (gameIsOver = false) --> markSpace(e)')
       markSpace(e);
@@ -286,6 +320,7 @@ const game = (() => {
     getPlayerNames();
     createNewPlayers();
     startNewRound();
+    displayInfo();
   })
 
 
