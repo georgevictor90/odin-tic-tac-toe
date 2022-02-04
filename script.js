@@ -127,15 +127,20 @@ const game = (() => {
   // CHECKS THE CURRENT PLAYER AND MARKS THE CLICKED SPACE WITH ITS MARK, THEN SWITCHES CURRENT PLAYER AND CHECK FOR WIN
   const markSpace = (e) => {
     index = gameBoard.gridTiles.indexOf(e.target);
+    console.log(`markSpace --> index: ${index}, player1.mark: ${player1.mark}, player2.mark: ${player2.mark}`);
     if (!(gameBoard.gameBoardArr[index] === '')) return
     if (player1.currentPlayer === 'true') {
       gameBoard.gameBoardArr[index] = player1.mark;
-      console.dir(gameBoard.gameBoardArr);
     }
     if (player2.currentPlayer === 'true') {
       gameBoard.gameBoardArr[index] = player2.mark;
     }
+    console.log(`array before render: ${gameBoard.gameBoardArr}`);
+    console.table(gameBoard.gridTiles);
     gameBoard.render();
+    console.log(`after render: ${gameBoard.gameBoardArr}`);
+    console.table(gameBoard.gridTiles);
+
     switchCurrentPlayer();
 
     isArrayFull = gameBoard.gameBoardArr.every(element => element !== '');
@@ -161,6 +166,7 @@ const game = (() => {
       ((gameBoard.gameBoardArr[6] === gameBoard.gameBoardArr[7]) && (gameBoard.gameBoardArr[7] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'X'))) {
       gameIsOver = true;
       declareWinner('X');
+      return
 
     } else if (
       ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[1]) && (gameBoard.gameBoardArr[1] === gameBoard.gameBoardArr[2]) && (gameBoard.gameBoardArr[2] === 'O')) ||
@@ -170,6 +176,7 @@ const game = (() => {
       ((gameBoard.gameBoardArr[6] === gameBoard.gameBoardArr[7]) && (gameBoard.gameBoardArr[7] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'O'))) {
       gameIsOver = true;
       declareWinner('O');
+      return
 
     } else return
   }
@@ -185,6 +192,7 @@ const game = (() => {
       ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[5]) && (gameBoard.gameBoardArr[5] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'X'))) {
       gameIsOver = true;
       declareWinner('X');
+      return
 
     } else if (
       ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[3]) && (gameBoard.gameBoardArr[3] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'O')) ||
@@ -194,6 +202,7 @@ const game = (() => {
       ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[5]) && (gameBoard.gameBoardArr[5] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'O'))) {
       gameIsOver = true;
       declareWinner('O');
+      return
 
     } else return
   }
@@ -207,6 +216,7 @@ const game = (() => {
       ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'X'))) {
       gameIsOver = true;
       declareWinner('X');
+      return
 
     } else if (
       ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'O')) ||
@@ -214,6 +224,7 @@ const game = (() => {
       ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'O'))) {
       gameIsOver = true;
       declareWinner('O');
+      return
 
     } else return
   }
@@ -249,18 +260,23 @@ const game = (() => {
   const startNewRound = () => {
     gameIsOver = false;
     setCurrentPlayer();
-    gameBoard.gameBoardArr = gameBoard.gameBoardArr.map((elem, ind) => gameBoard.gameBoardArr[ind] = '');
-    gameBoard.render();
+    gameBoard.gameBoardArr = ["", "", "", "", "", "", "", "", ""];
+    console.log(`Fired startNewRound, gameIsOver = false, setCurrentPlayer, gameBoardArr is empty`);
+    // gameBoard.render();
   }
 
   // STARTS GAME
   const playGame = (e) => {
+    console.log('Fired playGame')
     if (gameIsOver === true) {
+      console.log('playGame if --> gameIsOver = true, startNewRound, markSpace(e)')
       startNewRound();
-      setCurrentPlayer();
+      markSpace(e);
     } else {
+      console.log('playGame else (gameIsOver = false) --> markSpace(e)')
       markSpace(e);
     }
+    
   }
 
   // EVENT LISTENERS
@@ -273,7 +289,7 @@ const game = (() => {
   newGameBtn.addEventListener('click', () => {
     getPlayerNames();
     createNewPlayers();
-    setCurrentPlayer();
+    startNewRound();
   })
 
 
@@ -290,15 +306,16 @@ const game = (() => {
 
 
 const gameBoard = (() => {
-
   let gameBoardArr = ["", "", "", "", "", "", "", "", ""];
   let gridTiles = Array.from(document.getElementsByClassName('gridTile'));
   let grid = document.getElementById('gameBoard');
 
   // ASSIGNS MARKS IN GRID TILES FOR EACH ELEMENT OF THE ARRAY
   const render = () => {
+    console.log('Fired render');
+    console.log(gameBoard.gameBoardArr);
     for (let i = 0; i < gridTiles.length; i++) {
-      gridTiles[i].textContent = gameBoardArr[i];
+      gridTiles[i].textContent = gameBoard.gameBoardArr[i]
     }
     return gridTiles
   }
