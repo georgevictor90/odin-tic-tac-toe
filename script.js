@@ -135,11 +135,7 @@ const game = (() => {
     if (player2.currentPlayer === 'true') {
       gameBoard.gameBoardArr[index] = player2.mark;
     }
-    console.log(`array before render: ${gameBoard.gameBoardArr}`);
-    console.table(gameBoard.gridTiles);
     gameBoard.render();
-    console.log(`after render: ${gameBoard.gameBoardArr}`);
-    console.table(gameBoard.gridTiles);
 
     switchCurrentPlayer();
 
@@ -150,6 +146,7 @@ const game = (() => {
 
   // CHECKS FOR WIN ON ROWS, COLUMNS AND DIAGONALS , THEN CHECKS FOR DRAW
   const checkForWin = () => {
+    console.log('Fired checkForWin');
     checkRows();
     checkColumns();
     checkDiagonals();
@@ -262,7 +259,7 @@ const game = (() => {
     setCurrentPlayer();
     gameBoard.gameBoardArr = ["", "", "", "", "", "", "", "", ""];
     console.log(`Fired startNewRound, gameIsOver = false, setCurrentPlayer, gameBoardArr is empty`);
-    // gameBoard.render();
+    gameBoard.render();
   }
 
   // STARTS GAME
@@ -271,7 +268,6 @@ const game = (() => {
     if (gameIsOver === true) {
       console.log('playGame if --> gameIsOver = true, startNewRound, markSpace(e)')
       startNewRound();
-      markSpace(e);
     } else {
       console.log('playGame else (gameIsOver = false) --> markSpace(e)')
       markSpace(e);
@@ -313,7 +309,6 @@ const gameBoard = (() => {
   // ASSIGNS MARKS IN GRID TILES FOR EACH ELEMENT OF THE ARRAY
   const render = () => {
     console.log('Fired render');
-    console.log(gameBoard.gameBoardArr);
     for (let i = 0; i < gridTiles.length; i++) {
       gridTiles[i].textContent = gameBoard.gameBoardArr[i]
     }
