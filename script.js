@@ -1,7 +1,7 @@
 const game = (() => {
+
+  // CREATE VARIABLES
   let gameMode;
-  let currentPlayer;
-  let playerName;
   let playerMark;
   let player1Name;
   let player2Name;
@@ -11,24 +11,24 @@ const game = (() => {
   let gameIsOver = false;
   let isArrayFull;
 
+  // GRAB DOM ELEMENTS
+  const newGameBtn = document.getElementById('newGameBtn');
+  const displayWinner = document.getElementById('displayWinner');
+
+  // PLAYER OBJECT FACTORY FUNCTION
   const player = (name, mark) => {
-    this.name = name;
-    this.mark = mark;
-    let currentPlayer
     return {
       name,
       mark,
-      currentPlayer: currentPlayer,
     }
   }
 
+  // CREATE PLAYERS
   const player1 = player('name', 'mark');
   const player2 = player('name2', 'mark2');
-  const newGameBtn = document.getElementById('newGameBtn');
-  const newGameForm = document.getElementById('newGameForm');
-  const displayWinner = document.getElementById('displayWinner');
 
 
+  // GAME MODE 1 MEANS SINGLE PLAYER (VS COMPUTER), GAME MODE 2 MEANS TWO PLAYERS (PLAYER VS PLAYER)
   const setGameMode = () => {
     if (document.getElementById('vsComputer').checked) {
       document.getElementById('vsComputerForm').classList.add('visible');
@@ -48,6 +48,7 @@ const game = (() => {
     return gameMode
   }
 
+  // GETS THE SELECTED PLAYER MARK FOR SINGLE PLAYER GAME MODE
   const getMark1 = () => {
     if ((!document.getElementById('X').checked) && (!document.getElementById('O').checked)) return
 
@@ -59,6 +60,7 @@ const game = (() => {
     }
   }
 
+  // GETS THE SELECTED PLAYER MARKS FOR 2 PLAYERS GAME MODE
   const getMark2 = () => {
     if ((!document.getElementById('p1-X').checked) && (!document.getElementById('p1-O').checked)) return
 
@@ -72,7 +74,7 @@ const game = (() => {
     }
   }
 
-
+  // GETS THE PLAYER NAMES FROM USER INPUT VALUES
   const getPlayerNames = () => {
     if (gameMode === 2) {
       player1Name = document.getElementById('player1Name').value;
@@ -85,6 +87,7 @@ const game = (() => {
 
   }
 
+  // ASSIGNS THE PLAYER NAMES AND MARKS TO THE PLAYER OBJECTS
   const createNewPlayers = () => {
     player1.name = player1Name;
     player1.mark = player1Mark;
@@ -92,6 +95,7 @@ const game = (() => {
     player2.mark = player2Mark;
   }
 
+  //SETS THE CURRENT PLAYER FOR THE FIRST MOVE BASED ON MARK (x starts first)
   const setCurrentPlayer = () => {
     if (player1.mark === 'X') {
       player1.currentPlayer = 'true';
@@ -105,6 +109,7 @@ const game = (() => {
 
   }
 
+  // SWITCHES CURRENT PLAYER AFTER EACH TURN
   const switchCurrentPlayer = () => {
     if (player1.currentPlayer === 'true' && player2.currentPlayer === 'false') {
       player1.currentPlayer = 'false';
@@ -116,13 +121,16 @@ const game = (() => {
     }
   }
 
+  // RETURNS VALUE OF GAMEISOVER
   const getGameIsOver = () => gameIsOver;
 
+  // CHECKS THE CURRENT PLAYER AND MARKS THE CLICKED SPACE WITH ITS MARK, THEN SWITCHES CURRENT PLAYER AND CHECK FOR WIN
   const markSpace = (e) => {
     index = gameBoard.gridTiles.indexOf(e.target);
     if (!(gameBoard.gameBoardArr[index] === '')) return
     if (player1.currentPlayer === 'true') {
       gameBoard.gameBoardArr[index] = player1.mark;
+      console.dir(gameBoard.gameBoardArr);
     }
     if (player2.currentPlayer === 'true') {
       gameBoard.gameBoardArr[index] = player2.mark;
@@ -135,14 +143,15 @@ const game = (() => {
     checkForWin()
   }
 
+  // CHECKS FOR WIN ON ROWS, COLUMNS AND DIAGONALS , THEN CHECKS FOR DRAW
   const checkForWin = () => {
     checkRows();
     checkColumns();
     checkDiagonals();
     checkDraw();
-    console.log(gameIsOver);
   }
 
+  // CHECKS FOR THREE IDENTICAL MARKS ON GRID ROWS
   const checkRows = () => {
     if (
       ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[1]) && (gameBoard.gameBoardArr[1] === gameBoard.gameBoardArr[2]) && (gameBoard.gameBoardArr[2] === 'X')) ||
@@ -166,7 +175,7 @@ const game = (() => {
   }
 
 
-
+  // CHECKS FOR THREE IDENTICAL MARKS ON GRID COLUMNS
   const checkColumns = () => {
     if (
       ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[3]) && (gameBoard.gameBoardArr[3] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'X')) ||
@@ -190,7 +199,7 @@ const game = (() => {
   }
 
 
-
+  // CHECKS FOR THREE IDENTICAL MARKS ON GRID DIAGONALS
   const checkDiagonals = () => {
     if (
       ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'X')) ||
@@ -209,6 +218,7 @@ const game = (() => {
     } else return
   }
 
+  // CHECKS FOR DRAW
   const checkDraw = () => {
     if (gameIsOver === false && isArrayFull === true) {
       gameIsOver = true;
@@ -216,6 +226,7 @@ const game = (() => {
     }
   }
 
+  // ANNOUNCES DRAW GAME ON SCREEN
   const declareDraw = () => {
     displayWinner.textContent = "It's a draw!";
     displayWinner.classList.add('visible');
@@ -223,7 +234,7 @@ const game = (() => {
   }
 
 
-
+  // ANNOUNCES WINNER OF ROUND ON SCREEN
   const declareWinner = (mark) => {
     if (player1.mark === mark) {
       displayWinner.textContent = `${player1.name} won! Congratulations!`;
@@ -234,12 +245,25 @@ const game = (() => {
     displayWinner.classList.remove('hidden');
   }
 
+  // CLEARS THE GRID AND STARTS NEW ROUND
   const startNewRound = () => {
     gameIsOver = false;
-    gameBoard.gameBoardArr = gameBoard.gameBoardArr.map((elem, ind) => gameBoard.gameBoardArr[ind] = '')
+    setCurrentPlayer();
+    gameBoard.gameBoardArr = gameBoard.gameBoardArr.map((elem, ind) => gameBoard.gameBoardArr[ind] = '');
     gameBoard.render();
   }
 
+  // STARTS GAME
+  const playGame = (e) => {
+    if (gameIsOver === true) {
+      startNewRound();
+      setCurrentPlayer();
+    } else {
+      markSpace(e);
+    }
+  }
+
+  // EVENT LISTENERS
   document.getElementById('chooseMode').addEventListener('click', setGameMode)
 
   document.getElementById('playerMark').addEventListener('click', getMark1)
@@ -252,14 +276,6 @@ const game = (() => {
     setCurrentPlayer();
   })
 
-  const playGame = (e) => {
-    console.log('fired playgame');
-    if (gameIsOver === true) {
-      startNewRound();
-    } else {
-      markSpace(e);
-    }
-  }
 
   return {
     markSpace,
@@ -279,16 +295,15 @@ const gameBoard = (() => {
   let gridTiles = Array.from(document.getElementsByClassName('gridTile'));
   let grid = document.getElementById('gameBoard');
 
-  const render = function () {
+  // ASSIGNS MARKS IN GRID TILES FOR EACH ELEMENT OF THE ARRAY
+  const render = () => {
     for (let i = 0; i < gridTiles.length; i++) {
-      console.log(gameBoardArr);
       gridTiles[i].textContent = gameBoardArr[i];
     }
-    console.table(gridTiles);
     return gridTiles
   }
 
-
+  // EVENT LISTENER FOR STARTING THE GAME
   grid.addEventListener('click', game.playGame);
 
 
