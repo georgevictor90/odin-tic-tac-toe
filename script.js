@@ -170,22 +170,27 @@ const game = (() => {
   // RETURNS VALUE OF GAMEISOVER
   const getGameIsOver = () => gameIsOver;
 
-  // CHECKS THE CURRENT PLAYER AND MARKS THE CLICKED SPACE WITH ITS MARK, THEN SWITCHES CURRENT PLAYER AND CHECK FOR WIN
-  const markSpace = (e) => {
-    index = gameBoard.gridTiles.indexOf(e.target);
-    if (!(gameBoard.gameBoardArr[index] === '')) return
-    if (player1.currentPlayer === 'true') {
-      gameBoard.gameBoardArr[index] = player1.mark;
-    }
-    if (player2.currentPlayer === 'true') {
-      gameBoard.gameBoardArr[index] = player2.mark;
-    }
-    gameBoard.render();
-    switchCurrentPlayer();
-    isArrayFull = gameBoard.gameBoardArr.every(element => element !== '');
-    checkRoundWin()
-    checkGameSetWin();
+ // CHECKS THE CURRENT PLAYER AND MARKS THE CLICKED SPACE WITH ITS MARK, THEN SWITCHES CURRENT PLAYER AND CHECK FOR WIN
+ const markSpace = (e) => {
+  index = gameBoard.gridTiles.indexOf(e.target);
+  if (!(gameBoard.gameBoardArr[index] === '')) return
+  if (player1.currentPlayer === 'true') {
+    gameBoard.gameBoardArr[index] = player1.mark;
   }
+  if (player2.currentPlayer === 'true') {
+    gameBoard.gameBoardArr[index] = player2.mark;
+  }
+}
+
+// PLAYS ONE ROUND OF TIC TAC TOE
+const playRound = (e) => {
+  markSpace(e);
+  gameBoard.render();
+  switchCurrentPlayer();
+  isArrayFull = gameBoard.gameBoardArr.every(element => element !== '');
+  checkRoundWin()
+  checkGameSetWin();
+}
 
   // CHECKS FOR WIN ON ROWS, COLUMNS AND DIAGONALS , THEN CHECKS FOR DRAW
   const checkRoundWin = () => {
@@ -321,7 +326,7 @@ const game = (() => {
       startNewRound();
       hideElement(displayWinner);
     } else {
-      markSpace(e);
+      playRound(e);
     }
     
   }
@@ -346,6 +351,7 @@ const game = (() => {
     switchCurrentPlayer,
     startNewRound,
     getGameIsOver,
+    gameSetIsOver,
     playGame,
   }
 
