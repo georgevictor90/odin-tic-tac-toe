@@ -9,6 +9,7 @@ const game = (() => {
   let player2Mark;
   let index;
   let gameIsOver = false;
+  let gameSetIsOver = false;
   let isArrayFull;
   let player1Score = 0;
   let player2Score = 0;
@@ -48,25 +49,27 @@ const game = (() => {
   const player1 = player('name', 'mark');
   const player2 = player('name2', 'mark2');
 
+  //FUNCTONS TO SHOW/HIDE ELEMENTS ON THE PAGE
+  const hideElement = (el) => {
+    el.classList.add('hidden');
+    el.classList.remove('visible');
+  } 
+
+  const showElement = (el) => {
+    el.classList.add('visible');
+    el.classList.remove('hidden');
+  } 
 
   // GAME MODE 1 MEANS SINGLE PLAYER (VS COMPUTER), GAME MODE 2 MEANS TWO PLAYERS (PLAYER VS PLAYER)
   const setGameMode = () => {
     if (vsComputer.checked) {
-      vsComputerForm.classList.add('visible');
-      vsComputerForm.classList.remove('hidden');
-
-      vsPlayerForm.classList.remove('visible');
-      vsPlayerForm.classList.add('hidden');
-
+      showElement(vsComputerForm);
+      hideElement(vsPlayerForm);
       gameMode = 1;
     }
     if (vsPlayer.checked) {
-      vsPlayerForm.classList.add('visible');
-      vsPlayerForm.classList.remove('hidden');
-
-      vsComputerForm.classList.remove('visible');
-      vsComputerForm.classList.add('hidden');
-
+      showElement(vsPlayerForm);
+      hideElement(vsComputerForm);
       gameMode = 2
     }
     if (!gameMode) return
@@ -170,7 +173,6 @@ const game = (() => {
   // CHECKS THE CURRENT PLAYER AND MARKS THE CLICKED SPACE WITH ITS MARK, THEN SWITCHES CURRENT PLAYER AND CHECK FOR WIN
   const markSpace = (e) => {
     index = gameBoard.gridTiles.indexOf(e.target);
-    console.log(`markSpace --> index: ${index}, player1.mark: ${player1.mark}, player2.mark: ${player2.mark}`);
     if (!(gameBoard.gameBoardArr[index] === '')) return
     if (player1.currentPlayer === 'true') {
       gameBoard.gameBoardArr[index] = player1.mark;
@@ -179,22 +181,24 @@ const game = (() => {
       gameBoard.gameBoardArr[index] = player2.mark;
     }
     gameBoard.render();
-
     switchCurrentPlayer();
-
     isArrayFull = gameBoard.gameBoardArr.every(element => element !== '');
-
-    checkForWin()
+    checkRoundWin()
+    checkGameSetWin();
   }
 
   // CHECKS FOR WIN ON ROWS, COLUMNS AND DIAGONALS , THEN CHECKS FOR DRAW
-  const checkForWin = () => {
-    console.log('Fired checkForWin');
+  const checkRoundWin = () => {
     checkRows();
     checkColumns();
     checkDiagonals();
     checkDraw();
     displayScores();
+  }
+
+  // CHECKS IF ANY OF THE PLAYERS HAS REACHED A SCORE OF 5
+  const checkGameSetWin = () => {
+    if (player1Score === 5 || player2Score === 5) gameSetIsOver = true;
   }
 
   // CHECKS FOR THREE IDENTICAL MARKS ON GRID ROWS
@@ -299,8 +303,7 @@ const game = (() => {
     } else if (player2.mark === mark) {
       displayWinner.textContent = `${player2.name} won! Congratulations!`;
     }
-    displayWinner.classList.add('visible');
-    displayWinner.classList.remove('hidden');
+    showElement(displayWinner);
   }
   
 
@@ -309,20 +312,15 @@ const game = (() => {
     gameIsOver = false;
     setCurrentPlayer();
     gameBoard.gameBoardArr = ["", "", "", "", "", "", "", "", ""];
-    console.log(`Fired startNewRound, gameIsOver = false, setCurrentPlayer, gameBoardArr is empty`);
     gameBoard.render();
   }
 
   // STARTS GAME
   const playGame = (e) => {
-    console.log('Fired playGame')
     if (gameIsOver === true) {
-      console.log('playGame if --> gameIsOver = true, startNewRound, markSpace(e)')
       startNewRound();
-      displayWinner.classList.remove('visible');
-      displayWinner.classList.add('hidden');
+      hideElement(displayWinner);
     } else {
-      console.log('playGame else (gameIsOver = false) --> markSpace(e)')
       markSpace(e);
     }
     
@@ -362,8 +360,7 @@ const gameBoard = (() => {
 
   // ASSIGNS MARKS IN GRID TILES FOR EACH ELEMENT OF THE ARRAY
   const render = () => {
-    console.log('Fired render');
-    for (let i = 0; i < gridTiles.length; i++) {
+     for (let i = 0; i < gridTiles.length; i++) {
       gridTiles[i].textContent = gameBoard.gameBoardArr[i]
     }
     return gridTiles
