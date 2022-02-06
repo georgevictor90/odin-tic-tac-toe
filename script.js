@@ -16,10 +16,25 @@ const game = (() => {
   // GRAB DOM ELEMENTS
   const newGameBtn = document.getElementById('newGameBtn');
   const displayWinner = document.getElementById('displayWinner');
-  const p1NameInfo = document.getElementById('p1Name');
-  const p2NameInfo = document.getElementById('p2Name');
-  const p1ScoreInfo = document.getElementById('p1Score');
-  const p2ScoreInfo = document.getElementById('p2Score');
+  const p1NameInfo = document.getElementById('p1NameInfo');
+  const p2NameInfo = document.getElementById('p2NameInfo');
+  const p1ScoreInfo = document.getElementById('p1ScoreInfo');
+  const p2ScoreInfo = document.getElementById('p2ScoreInfo');
+  const vsComputer = document.getElementById('vsComputer');
+  const vsComputerForm = document.getElementById('vsComputerForm');
+  const vsPlayerForm = document.getElementById('vsPlayerForm');
+  const vsPlayer = document.getElementById('vsPlayer');
+  const mode1ChoiceX = document.getElementById('X');
+  const mode1ChoiceO = document.getElementById('O');
+  const mode2ChoiceX = document.getElementById('p1-X');
+  const mode2ChoiceO = document.getElementById('p1-O');
+  const player1NameInput = document.getElementById('player1Name');
+  const player2NameInput = document.getElementById('player2Name');
+  const mode1PlayerNameInput = document.getElementById('playerName');
+  const gameModeDiv = document.getElementById('chooseMode');
+  const player1MarkDiv = document.getElementById('player1Mark');
+  const mode1PlayerMarkDiv = document.getElementById('playerMark');
+
 
   // PLAYER OBJECT FACTORY FUNCTION
   const player = (name, mark) => {
@@ -36,18 +51,22 @@ const game = (() => {
 
   // GAME MODE 1 MEANS SINGLE PLAYER (VS COMPUTER), GAME MODE 2 MEANS TWO PLAYERS (PLAYER VS PLAYER)
   const setGameMode = () => {
-    if (document.getElementById('vsComputer').checked) {
-      document.getElementById('vsComputerForm').classList.add('visible');
-      document.getElementById('vsComputerForm').classList.remove('hidden');
-      document.getElementById('vsPlayerForm').classList.remove('visible');
-      document.getElementById('vsPlayerForm').classList.add('hidden');
+    if (vsComputer.checked) {
+      vsComputerForm.classList.add('visible');
+      vsComputerForm.classList.remove('hidden');
+
+      vsPlayerForm.classList.remove('visible');
+      vsPlayerForm.classList.add('hidden');
+
       gameMode = 1;
     }
-    if (document.getElementById('vsPlayer').checked) {
-      document.getElementById('vsPlayerForm').classList.add('visible');
-      document.getElementById('vsPlayerForm').classList.remove('hidden');
-      document.getElementById('vsComputerForm').classList.remove('visible');
-      document.getElementById('vsComputerForm').classList.add('hidden');
+    if (vsPlayer.checked) {
+      vsPlayerForm.classList.add('visible');
+      vsPlayerForm.classList.remove('hidden');
+
+      vsComputerForm.classList.remove('visible');
+      vsComputerForm.classList.add('hidden');
+
       gameMode = 2
     }
     if (!gameMode) return
@@ -56,25 +75,25 @@ const game = (() => {
 
   // GETS THE SELECTED PLAYER MARK FOR SINGLE PLAYER GAME MODE
   const getMark1 = () => {
-    if ((!document.getElementById('X').checked) && (!document.getElementById('O').checked)) return
+    if ((!mode1ChoiceX.checked) && (!mode1ChoiceO.checked)) return
 
-    if (document.getElementById('X').checked) {
+    if (mode1ChoiceX.checked) {
       playerMark = "X"
     }
-    if (document.getElementById('O').checked) {
+    if (mode1ChoiceO.checked) {
       playerMark = "O"
     }
   }
 
   // GETS THE SELECTED PLAYER MARKS FOR 2 PLAYERS GAME MODE
   const getMark2 = () => {
-    if ((!document.getElementById('p1-X').checked) && (!document.getElementById('p1-O').checked)) return
+    if ((!mode2ChoiceX.checked) && (!mode2ChoiceO.checked)) return
 
-    if (document.getElementById('p1-X').checked) {
+    if (mode2ChoiceX.checked) {
       player1Mark = "X";
       player2Mark = "O";
     }
-    if (document.getElementById('p1-O').checked) {
+    if (mode2ChoiceO.checked) {
       player1Mark = "O";
       player2Mark = "X"
     }
@@ -83,12 +102,12 @@ const game = (() => {
   // GETS THE PLAYER NAMES FROM USER INPUT VALUES
   const getPlayerNames = () => {
     if (gameMode === 2) {
-      player1Name = document.getElementById('player1Name').value;
-      player2Name = document.getElementById('player2Name').value;
+      player1Name = player1NameInput.value;
+      player2Name = player2NameInput.value;
     }
     if (gameMode === 1) {
-      player1Name = document.getElementById('playerName').value;
-      player2Name = 'Computer';
+      player1Name = mode1PlayerNameInput.value;
+      player2Name = 'CPU';
     }
 
   }
@@ -310,11 +329,11 @@ const game = (() => {
   }
 
   // EVENT LISTENERS
-  document.getElementById('chooseMode').addEventListener('click', setGameMode)
+  gameModeDiv.addEventListener('click', setGameMode)
 
-  document.getElementById('playerMark').addEventListener('click', getMark1)
+  mode1PlayerMarkDiv.addEventListener('click', getMark1)
 
-  document.getElementById('player1Mark').addEventListener('click', getMark2)
+  player1MarkDiv.addEventListener('click', getMark2)
 
   newGameBtn.addEventListener('click', () => {
     getPlayerNames();
