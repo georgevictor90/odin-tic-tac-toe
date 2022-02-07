@@ -50,18 +50,18 @@ const game = (() => {
   const player2 = player('name2', 'mark2');
 
   //FUNCTONS TO SHOW/HIDE ELEMENTS ON THE PAGE
-  const hideElement = (el) => {
+  function hideElement(el) {
     el.classList.add('hidden');
     el.classList.remove('visible');
   } 
 
-  const showElement = (el) => {
+  function showElement(el) {
     el.classList.add('visible');
     el.classList.remove('hidden');
   } 
 
   // GAME MODE 1 MEANS SINGLE PLAYER (VS COMPUTER), GAME MODE 2 MEANS TWO PLAYERS (PLAYER VS PLAYER)
-  const setGameMode = () => {
+  function setGameMode() {
     if (vsComputer.checked) {
       showElement(vsComputerForm);
       hideElement(vsPlayerForm);
@@ -77,7 +77,7 @@ const game = (() => {
   }
 
   // GETS THE SELECTED PLAYER MARK FOR SINGLE PLAYER GAME MODE
-  const getMark1 = () => {
+  function getMark1() {
     if ((!mode1ChoiceX.checked) && (!mode1ChoiceO.checked)) return
 
     if (mode1ChoiceX.checked) {
@@ -89,7 +89,7 @@ const game = (() => {
   }
 
   // GETS THE SELECTED PLAYER MARKS FOR 2 PLAYERS GAME MODE
-  const getMark2 = () => {
+  function getMark2() {
     if ((!mode2ChoiceX.checked) && (!mode2ChoiceO.checked)) return
 
     if (mode2ChoiceX.checked) {
@@ -103,7 +103,7 @@ const game = (() => {
   }
 
   // GETS THE PLAYER NAMES FROM USER INPUT VALUES
-  const getPlayerNames = () => {
+  function getPlayerNames() {
     if (gameMode === 2) {
       player1Name = player1NameInput.value;
       player2Name = player2NameInput.value;
@@ -116,7 +116,7 @@ const game = (() => {
   }
 
   // ASSIGNS THE PLAYER NAMES AND MARKS TO THE PLAYER OBJECTS
-  const createNewPlayers = () => {
+  function createNewPlayers() {
     player1.name = player1Name;
     player1.mark = player1Mark;
     player2.name = player2Name;
@@ -124,25 +124,25 @@ const game = (() => {
   }
 
   //DISPLAYS THE PLAYER NAMES IN THE PLAYERINFO DIV
-  const displayPlayerNames = () => {
+  function displayPlayerNames() {
     p1NameInfo.textContent = `Player1 Name: ${player1Name.toUpperCase()}`;
     p2NameInfo.textContent = `Player2 Name: ${player2Name.toUpperCase()}`;
   }
 
   //DISPLAYS SCORES IN PLAYERINFO DIV
-  const displayScores = () => {
+  function displayScores() {
     p1ScoreInfo.textContent = `Player1 Score: ${player1Score}`;
     p2ScoreInfo.textContent = `Player2 Score: ${player2Score}`;
   }
 
   //DISPLAY PLAYER NAMES AND SCORES
-  const displayInfo = () => {
+  function displayInfo() {
     displayPlayerNames();
     displayScores();
   }
 
   //SETS THE CURRENT PLAYER FOR THE FIRST MOVE BASED ON MARK (x starts first)
-  const setCurrentPlayer = () => {
+  function setCurrentPlayer() {
     if (player1.mark === 'X') {
       player1.currentPlayer = 'true';
       player2.currentPlayer = 'false';
@@ -156,7 +156,7 @@ const game = (() => {
   }
 
   // SWITCHES CURRENT PLAYER AFTER EACH TURN
-  const switchCurrentPlayer = () => {
+  function switchCurrentPlayer() {
     if (player1.currentPlayer === 'true' && player2.currentPlayer === 'false') {
       player1.currentPlayer = 'false';
       player2.currentPlayer = 'true';
@@ -168,10 +168,10 @@ const game = (() => {
   }
 
   // RETURNS VALUE OF GAMEISOVER
-  const getGameIsOver = () => gameIsOver;
+  function getGameIsOver() {gameIsOver};
 
  // CHECKS THE CURRENT PLAYER AND MARKS THE CLICKED SPACE WITH ITS MARK, THEN SWITCHES CURRENT PLAYER AND CHECK FOR WIN
- const markSpace = (e) => {
+ function markSpace(e) {
   index = gameBoard.gridTiles.indexOf(e.target);
   if (!(gameBoard.gameBoardArr[index] === '')) return
   if (player1.currentPlayer === 'true') {
@@ -183,7 +183,7 @@ const game = (() => {
 }
 
 // PLAYS ONE ROUND OF TIC TAC TOE
-const playRound = (e) => {
+function playRound(e) {
   markSpace(e);
   gameBoard.render();
   switchCurrentPlayer();
@@ -193,7 +193,7 @@ const playRound = (e) => {
 }
 
   // CHECKS FOR WIN ON ROWS, COLUMNS AND DIAGONALS , THEN CHECKS FOR DRAW
-  const checkRoundWin = () => {
+  function checkRoundWin() {
     checkRows();
     checkColumns();
     checkDiagonals();
@@ -202,12 +202,12 @@ const playRound = (e) => {
   }
 
   // CHECKS IF ANY OF THE PLAYERS HAS REACHED A SCORE OF 5
-  const checkGameSetWin = () => {
+  function checkGameSetWin() {
     if (player1Score === 5 || player2Score === 5) gameSetIsOver = true;
   }
 
   // CHECKS FOR THREE IDENTICAL MARKS ON GRID ROWS
-  const checkRows = () => {
+  function checkRows() {
     if (
       ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[1]) && (gameBoard.gameBoardArr[1] === gameBoard.gameBoardArr[2]) && (gameBoard.gameBoardArr[2] === 'X')) ||
 
@@ -235,7 +235,7 @@ const playRound = (e) => {
 
 
   // CHECKS FOR THREE IDENTICAL MARKS ON GRID COLUMNS
-  const checkColumns = () => {
+  function checkColumns() {
     if (
       ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[3]) && (gameBoard.gameBoardArr[3] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'X')) ||
 
@@ -263,7 +263,7 @@ const playRound = (e) => {
 
 
   // CHECKS FOR THREE IDENTICAL MARKS ON GRID DIAGONALS
-  const checkDiagonals = () => {
+  function checkDiagonals() {
     if (
       ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'X')) ||
 
@@ -286,7 +286,7 @@ const playRound = (e) => {
   }
 
   // CHECKS FOR DRAW
-  const checkDraw = () => {
+  function checkDraw() {
     if (gameIsOver === false && isArrayFull === true) {
       gameIsOver = true;
       declareDraw();
@@ -294,7 +294,7 @@ const playRound = (e) => {
   }
 
   // ANNOUNCES DRAW GAME ON SCREEN
-  const declareDraw = () => {
+  function declareDraw() {
     displayWinner.textContent = "It's a draw!";
     displayWinner.classList.add('visible');
     displayWinner.classList.remove('hidden');
@@ -302,7 +302,7 @@ const playRound = (e) => {
 
 
   // ANNOUNCES WINNER OF ROUND ON SCREEN
-  const declareWinner = (mark) => {
+  function declareWinner(mark) {
     if (player1.mark === mark) {
       displayWinner.textContent = `${player1.name} won! Congratulations!`;
     } else if (player2.mark === mark) {
@@ -313,7 +313,7 @@ const playRound = (e) => {
   
 
   // CLEARS THE GRID AND STARTS NEW ROUND
-  const startNewRound = () => {
+  function startNewRound() {
     gameIsOver = false;
     setCurrentPlayer();
     gameBoard.gameBoardArr = ["", "", "", "", "", "", "", "", ""];
@@ -321,7 +321,7 @@ const playRound = (e) => {
   }
 
   // STARTS GAME
-  const playGame = (e) => {
+  function playGame(e) {
     if (gameIsOver === true) {
       startNewRound();
       hideElement(displayWinner);
@@ -353,6 +353,8 @@ const playRound = (e) => {
     getGameIsOver,
     gameSetIsOver,
     playGame,
+    player1,
+    player2,
   }
 
 
@@ -365,7 +367,7 @@ const gameBoard = (() => {
   let grid = document.getElementById('gameBoard');
 
   // ASSIGNS MARKS IN GRID TILES FOR EACH ELEMENT OF THE ARRAY
-  const render = () => {
+  function render() {
      for (let i = 0; i < gridTiles.length; i++) {
       gridTiles[i].textContent = gameBoard.gameBoardArr[i]
     }
