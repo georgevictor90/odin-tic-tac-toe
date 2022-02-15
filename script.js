@@ -246,6 +246,17 @@ function displayGameSetWinner() {
 }
 
 span.onclick = function() {
+  resetAll();
+}
+
+window.onclick = function(event) {
+  if (event.target == modal) {
+    resetAll();
+  }
+}
+
+// Resets everything for a new game
+function resetAll() {
   modal.style.display = "none";
   newGameForm.style.display = 'flex';
   gameModeDiv.addEventListener('click', setGameMode)
@@ -257,22 +268,6 @@ span.onclick = function() {
   hideElement(displayWinner);
   hideElement(vsPlayerForm);
   hideElement(vsComputerForm);
-}
-
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
-    newGameForm.style.display = 'flex';
-    gameModeDiv.addEventListener('click', setGameMode)
-    mode1PlayerMarkDiv.addEventListener('click', getMark1)
-    player1MarkDiv.addEventListener('click', getMark2)
-    newGameBtn.addEventListener('click', newGame);
-    displayPlayerNames();
-    displayScores();
-    hideElement(displayWinner);
-    hideElement(vsPlayerForm);
-    hideElement(vsComputerForm);
-  }
 }
 
 
