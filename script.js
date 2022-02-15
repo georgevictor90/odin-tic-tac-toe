@@ -131,8 +131,13 @@ const game = (() => {
 
   //DISPLAYS THE PLAYER NAMES IN THE PLAYERINFO DIV
   function displayPlayerNames() {
-    p1NameInfo.textContent = `Player1 Name: ${player1Name.toUpperCase()}`;
-    p2NameInfo.textContent = `Player2 Name: ${player2Name.toUpperCase()}`;
+    if (player1Name === null || player2Name === null) {
+      p1NameInfo.textContent = `Player1 Name: `;
+      p2NameInfo.textContent = `Player2 Name: `;
+    } else {
+      p1NameInfo.textContent = `Player1 Name: ${player1Name.toUpperCase()}`;
+      p2NameInfo.textContent = `Player2 Name: ${player2Name.toUpperCase()}`;
+    }
   }
 
   //DISPLAYS SCORES IN PLAYERINFO DIV
@@ -173,8 +178,6 @@ const game = (() => {
     }
   }
 
-  // // RETURNS VALUE OF GAMEISOVER
-  // function getGameIsOver() {gameIsOver};
 
  // CHECKS THE CURRENT PLAYER AND MARKS THE CLICKED SPACE WITH ITS MARK, THEN SWITCHES CURRENT PLAYER AND CHECK FOR WIN
  function markSpace(e) {
@@ -198,7 +201,39 @@ function playRound(e) {
   if (gameSetIsOver === true) {
     modal.style.display = 'block';
     displayGameSetWinner();
+    resetValues();
+    gameModeDiv.removeEventListener('click', setGameMode)
+    mode1PlayerMarkDiv.removeEventListener('click', getMark1)
+    player1MarkDiv.removeEventListener('click', getMark2)
+    newGameBtn.removeEventListener('click', newGame);
   }
+}
+
+// RESETS VALUES 
+function resetValues() {
+  gameMode = null;
+  gameIsOver = false;
+  gameSetIsOver = false;
+  gameBoard.gameBoardArr = ["", "", "", "", "", "", "", "", ""];
+  gameBoard.render();
+  player1Name = null;
+  player2Name = null;
+  player1Score = 0;
+  player2Score = 0;
+  player1.name = null;
+  player1.mark = null;
+  player1.winner = null;
+  player1.currentPlayer = null;
+  player2.name = null;
+  player2.mark = null;
+  player2.winner = null;
+  player2.currentPlayer = null;
+  player1NameInput.value = null;
+  player2NameInput.value = null;
+  vsPlayer.checked = false;
+  vsComputer.checked = false;
+  mode2ChoiceX.checked = false;
+  mode2ChoiceO.checked = false;
 }
 
 // DISPLAY GAME SET WINNER
@@ -212,11 +247,31 @@ function displayGameSetWinner() {
 
 span.onclick = function() {
   modal.style.display = "none";
+  newGameForm.style.display = 'flex';
+  gameModeDiv.addEventListener('click', setGameMode)
+  mode1PlayerMarkDiv.addEventListener('click', getMark1)
+  player1MarkDiv.addEventListener('click', getMark2)
+  newGameBtn.addEventListener('click', newGame);
+  displayPlayerNames();
+  displayScores();
+  hideElement(displayWinner);
+  hideElement(vsPlayerForm);
+  hideElement(vsComputerForm);
 }
 
 window.onclick = function(event) {
   if (event.target == modal) {
     modal.style.display = "none";
+    newGameForm.style.display = 'flex';
+    gameModeDiv.addEventListener('click', setGameMode)
+    mode1PlayerMarkDiv.addEventListener('click', getMark1)
+    player1MarkDiv.addEventListener('click', getMark2)
+    newGameBtn.addEventListener('click', newGame);
+    displayPlayerNames();
+    displayScores();
+    hideElement(displayWinner);
+    hideElement(vsPlayerForm);
+    hideElement(vsComputerForm);
   }
 }
 
@@ -380,13 +435,15 @@ window.onclick = function(event) {
 
   player1MarkDiv.addEventListener('click', getMark2)
 
-  newGameBtn.addEventListener('click', () => {
+  newGameBtn.addEventListener('click', newGame)
+
+  function newGame() {
     newGameForm.style.display = 'none';
     getPlayerNames();
     createNewPlayers();
     startNewRound();
     displayInfo();
-  })
+  }
 
 
   return {
@@ -396,8 +453,8 @@ window.onclick = function(event) {
     // getGameIsOver,
     // gameSetIsOver,
     playGame,
-    // player1,
-    // player2,
+    player1,
+    player2,
   }
 
 
