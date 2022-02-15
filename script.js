@@ -13,6 +13,7 @@ const game = (() => {
   let isArrayFull;
   let player1Score = 0;
   let player2Score = 0;
+  let switchPlayer;
 
   // GRAB DOM ELEMENTS
   const newGameForm = document.getElementById('newGameForm');
@@ -182,12 +183,19 @@ const game = (() => {
  // CHECKS THE CURRENT PLAYER AND MARKS THE CLICKED SPACE WITH ITS MARK, THEN SWITCHES CURRENT PLAYER AND CHECK FOR WIN
  function markSpace(e) {
   index = gameBoard.gridTiles.indexOf(e.target);
-  if (!(gameBoard.gameBoardArr[index] === '')) return
+  
+  if (!(gameBoard.gameBoardArr[index] === '')) {
+    switchPlayer = false;
+    return
+  }
+
   if (player1.currentPlayer === 'true') {
     gameBoard.gameBoardArr[index] = player1.mark;
+    switchPlayer = true;
   }
   if (player2.currentPlayer === 'true') {
     gameBoard.gameBoardArr[index] = player2.mark;
+    switchPlayer = true;
   }
 }
 
@@ -195,17 +203,22 @@ const game = (() => {
 function playRound(e) {
   markSpace(e);
   gameBoard.render();
-  switchCurrentPlayer();
-  isArrayFull = gameBoard.gameBoardArr.every(element => element !== '');
-  checkRoundWin();
-  if (gameSetIsOver === true) {
-    modal.style.display = 'block';
-    displayGameSetWinner();
-    resetValues();
-    gameModeDiv.removeEventListener('click', setGameMode)
-    mode1PlayerMarkDiv.removeEventListener('click', getMark1)
-    player1MarkDiv.removeEventListener('click', getMark2)
-    newGameBtn.removeEventListener('click', newGame);
+  if (switchPlayer === false) {
+    return
+  } else {
+    switchCurrentPlayer();
+    isArrayFull = gameBoard.gameBoardArr.every(element => element !== '');
+    checkRoundWin();
+
+    if (gameSetIsOver === true) {
+      modal.style.display = 'block';
+      displayGameSetWinner();
+      resetValues();
+      gameModeDiv.removeEventListener('click', setGameMode)
+      mode1PlayerMarkDiv.removeEventListener('click', getMark1)
+      player1MarkDiv.removeEventListener('click', getMark2)
+      newGameBtn.removeEventListener('click', newGame);
+    }
   }
 }
 
