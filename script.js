@@ -15,6 +15,7 @@ const game = (() => {
   let player2Score = 0;
 
   // GRAB DOM ELEMENTS
+  const newGameForm = document.getElementById('newGameForm');
   const newGameBtn = document.getElementById('newGameBtn');
   const displayWinner = document.getElementById('displayWinner');
   const p1NameInfo = document.getElementById('p1NameInfo');
@@ -35,6 +36,9 @@ const game = (() => {
   const gameModeDiv = document.getElementById('chooseMode');
   const player1MarkDiv = document.getElementById('player1Mark');
   const mode1PlayerMarkDiv = document.getElementById('playerMark');
+  const modal = document.getElementById("myModal");
+  const span = document.getElementsByClassName("close")[0];
+  const modalDisplayWinner = document.getElementById('modalDisplayWinner');
 
 
   // PLAYER OBJECT FACTORY FUNCTION
@@ -119,8 +123,10 @@ const game = (() => {
   function createNewPlayers() {
     player1.name = player1Name;
     player1.mark = player1Mark;
+    player1.winner = false;
     player2.name = player2Name;
     player2.mark = player2Mark;
+    player2.winner = false;
   }
 
   //DISPLAYS THE PLAYER NAMES IN THE PLAYERINFO DIV
@@ -189,7 +195,31 @@ function playRound(e) {
   switchCurrentPlayer();
   isArrayFull = gameBoard.gameBoardArr.every(element => element !== '');
   checkRoundWin();
+  if (gameSetIsOver === true) {
+    modal.style.display = 'block';
+    displayGameSetWinner();
+  }
 }
+
+// DISPLAY GAME SET WINNER
+function displayGameSetWinner() {
+  if (player1.winner === true) {
+    modalDisplayWinner.textContent = `${player1.name} won the game set!` ;
+  } else if (player2.winner === true) {
+    modalDisplayWinner.textContent = `${player2.name} won the game set!` ;
+  }
+}
+
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
+
 
   // CHECKS FOR WIN ON ROWS, COLUMNS AND DIAGONALS , THEN CHECKS FOR DRAW
   function checkRoundWin() {
@@ -204,6 +234,13 @@ function playRound(e) {
   function checkGameSetWin() {
     console.log('fired cGSW');
     if (player1Score === 5 || player2Score === 5) { gameSetIsOver = true };
+    if (player1Score === 5) {
+      player1.winner = true;
+      player2.winner = false;
+    } else if (player2Score === 5) {
+      player2.winner = true;
+      player1.winner = false;
+    }
   }
 
   // CHECKS FOR THREE IDENTICAL MARKS ON GRID ROWS
@@ -344,6 +381,7 @@ function playRound(e) {
   player1MarkDiv.addEventListener('click', getMark2)
 
   newGameBtn.addEventListener('click', () => {
+    newGameForm.style.display = 'none';
     getPlayerNames();
     createNewPlayers();
     startNewRound();
