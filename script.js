@@ -167,8 +167,8 @@ const game = (() => {
     }
   }
 
-  // RETURNS VALUE OF GAMEISOVER
-  function getGameIsOver() {gameIsOver};
+  // // RETURNS VALUE OF GAMEISOVER
+  // function getGameIsOver() {gameIsOver};
 
  // CHECKS THE CURRENT PLAYER AND MARKS THE CLICKED SPACE WITH ITS MARK, THEN SWITCHES CURRENT PLAYER AND CHECK FOR WIN
  function markSpace(e) {
@@ -188,8 +188,7 @@ function playRound(e) {
   gameBoard.render();
   switchCurrentPlayer();
   isArrayFull = gameBoard.gameBoardArr.every(element => element !== '');
-  checkRoundWin()
-  checkGameSetWin();
+  checkRoundWin();
 }
 
   // CHECKS FOR WIN ON ROWS, COLUMNS AND DIAGONALS , THEN CHECKS FOR DRAW
@@ -203,7 +202,8 @@ function playRound(e) {
 
   // CHECKS IF ANY OF THE PLAYERS HAS REACHED A SCORE OF 5
   function checkGameSetWin() {
-    if (player1Score === 5 || player2Score === 5) gameSetIsOver = true;
+    console.log('fired cGSW');
+    if (player1Score === 5 || player2Score === 5) { gameSetIsOver = true };
   }
 
   // CHECKS FOR THREE IDENTICAL MARKS ON GRID ROWS
@@ -216,7 +216,8 @@ function playRound(e) {
       ((gameBoard.gameBoardArr[6] === gameBoard.gameBoardArr[7]) && (gameBoard.gameBoardArr[7] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'X'))) {
       gameIsOver = true;
       declareWinner('X');
-      player1Score++;
+      player1.mark === 'X' ? player1Score++ : player2Score++;
+      checkGameSetWin();
       return
 
     } else if (
@@ -227,7 +228,8 @@ function playRound(e) {
       ((gameBoard.gameBoardArr[6] === gameBoard.gameBoardArr[7]) && (gameBoard.gameBoardArr[7] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'O'))) {
       gameIsOver = true;
       declareWinner('O');
-      player2Score++;
+      player1.mark === 'O' ? player1Score++ : player2Score++;
+      checkGameSetWin();
       return
 
     } else return
@@ -244,7 +246,8 @@ function playRound(e) {
       ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[5]) && (gameBoard.gameBoardArr[5] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'X'))) {
       gameIsOver = true;
       declareWinner('X');
-      player1Score++;
+      player1.mark === 'X' ? player1Score++ : player2Score++;
+      checkGameSetWin();
       return
 
     } else if (
@@ -255,7 +258,8 @@ function playRound(e) {
       ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[5]) && (gameBoard.gameBoardArr[5] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'O'))) {
       gameIsOver = true;
       declareWinner('O');
-      player2Score++;
+      player1.mark === 'O' ? player1Score++ : player2Score++;
+      checkGameSetWin();
       return
 
     } else return
@@ -270,7 +274,8 @@ function playRound(e) {
       ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'X'))) {
       gameIsOver = true;
       declareWinner('X');
-      player1Score++;
+      player1.mark === 'X' ? player1Score++ : player2Score++;
+      checkGameSetWin();
       return
 
     } else if (
@@ -279,7 +284,8 @@ function playRound(e) {
       ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'O'))) {
       gameIsOver = true;
       declareWinner('O');
-      player2Score++;
+      player1.mark === 'O' ? player1Score++ : player2Score++;
+      checkGameSetWin();
       return
 
     } else return
@@ -328,7 +334,6 @@ function playRound(e) {
     } else {
       playRound(e);
     }
-    
   }
 
   // EVENT LISTENERS
@@ -347,14 +352,14 @@ function playRound(e) {
 
 
   return {
-    markSpace,
-    switchCurrentPlayer,
-    startNewRound,
-    getGameIsOver,
-    gameSetIsOver,
+    // markSpace,
+    // switchCurrentPlayer,
+    // startNewRound,
+    // getGameIsOver,
+    // gameSetIsOver,
     playGame,
-    player1,
-    player2,
+    // player1,
+    // player2,
   }
 
 
@@ -379,9 +384,9 @@ const gameBoard = (() => {
 
 
   return {
-    gameBoardArr,
+    // gameBoardArr,
     gridTiles,
-    grid,
+    // grid,
     render,
   }
 })()
