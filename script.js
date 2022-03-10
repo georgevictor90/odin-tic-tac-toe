@@ -1,4 +1,5 @@
 const game = (() => {
+  let origBoard = ["0", "1", "2", "3", "4", "5", "6", "7", "8"];
 
   // CREATE VARIABLES
   let gameMode;
@@ -14,8 +15,11 @@ const game = (() => {
   let player1Score = 0;
   let player2Score = 0;
   let switchPlayer;
+  let first2Move;
 
   // GRAB DOM ELEMENTS
+  const gridTiles = Array.from(document.getElementsByClassName('gridTile'));
+  const grid = document.getElementById('gameBoard');
   const newGameForm = document.getElementById('newGameForm');
   const newGameBtn = document.getElementById('newGameBtn');
   const displayWinner = document.getElementById('displayWinner');
@@ -41,7 +45,6 @@ const game = (() => {
   const span = document.getElementsByClassName("close")[0];
   const modalDisplayWinner = document.getElementById('modalDisplayWinner');
 
-
   // PLAYER OBJECT FACTORY FUNCTION
   const player = (name, mark) => {
     return {
@@ -65,6 +68,30 @@ const game = (() => {
     el.classList.remove('hidden');
   } 
 
+  //SETS THE CURRENT PLAYER FOR THE FIRST MOVE BASED ON MARK (x starts first)
+  function setCurrentPlayer() {
+    if (player1.mark === 'X') {
+      player1.currentPlayer = 'true';
+      player2.currentPlayer = 'false';
+
+    } else if (player2.mark === 'X') {
+      player2.currentPlayer = 'true';
+      player1.currentPlayer = 'false';
+    }
+  }  
+
+  // SWITCHES CURRENT PLAYER AFTER EACH TURN
+  function switchCurrentPlayer() {
+    if (player1.currentPlayer === 'true' && player2.currentPlayer === 'false') {
+      player1.currentPlayer = 'false';
+      player2.currentPlayer = 'true';
+
+    } else if (player1.currentPlayer === 'false' && player2.currentPlayer === 'true') {
+      player1.currentPlayer = 'true';
+      player2.currentPlayer = 'false';
+    }
+  }  
+
   // GAME MODE 1 MEANS SINGLE PLAYER (VS COMPUTER), GAME MODE 2 MEANS TWO PLAYERS (PLAYER VS PLAYER)
   function setGameMode() {
     if (vsComputer.checked) {
@@ -78,7 +105,6 @@ const game = (() => {
       gameMode = 2
     }
     if (!gameMode) return
-    return gameMode
   }
 
   // GETS THE SELECTED PLAYER MARK FOR SINGLE PLAYER GAME MODE
@@ -86,10 +112,12 @@ const game = (() => {
     if ((!mode1ChoiceX.checked) && (!mode1ChoiceO.checked)) return
 
     if (mode1ChoiceX.checked) {
-      playerMark = "X"
+      player1Mark = "X";
+      player2Mark = "O";
     }
     if (mode1ChoiceO.checked) {
-      playerMark = "O"
+      player1Mark = "O";
+      player2Mark = "X";
     }
   }
 
@@ -117,7 +145,6 @@ const game = (() => {
       player1Name = mode1PlayerNameInput.value;
       player2Name = 'CPU';
     }
-
   }
 
   // ASSIGNS THE PLAYER NAMES AND MARKS TO THE PLAYER OBJECTS
@@ -143,8 +170,8 @@ const game = (() => {
 
   //DISPLAYS SCORES IN PLAYERINFO DIV
   function displayScores() {
-    p1ScoreInfo.textContent = `Player1 Score: ${player1Score}`;
-    p2ScoreInfo.textContent = `Player2 Score: ${player2Score}`;
+    p1ScoreInfo.textContent = `Player1 Score: ${player1.score}`;
+    p2ScoreInfo.textContent = `Player2 Score: ${player2.score}`;
   }
 
   //DISPLAY PLAYER NAMES AND SCORES
@@ -153,280 +180,249 @@ const game = (() => {
     displayScores();
   }
 
-  //SETS THE CURRENT PLAYER FOR THE FIRST MOVE BASED ON MARK (x starts first)
-  function setCurrentPlayer() {
-    if (player1.mark === 'X') {
-      player1.currentPlayer = 'true';
-      player2.currentPlayer = 'false';
-
-    } else if (player2.mark === 'X') {
-      player2.currentPlayer = 'true';
-      player1.currentPlayer = 'false';
-    }
-
-
-  }
-
-  // SWITCHES CURRENT PLAYER AFTER EACH TURN
-  function switchCurrentPlayer() {
-    if (player1.currentPlayer === 'true' && player2.currentPlayer === 'false') {
-      player1.currentPlayer = 'false';
-      player2.currentPlayer = 'true';
-
-    } else if (player1.currentPlayer === 'false' && player2.currentPlayer === 'true') {
-      player1.currentPlayer = 'true';
-      player2.currentPlayer = 'false';
-    }
-  }
-
-
- // CHECKS THE CURRENT PLAYER AND MARKS THE CLICKED SPACE WITH ITS MARK, THEN SWITCHES CURRENT PLAYER AND CHECK FOR WIN
- function markSpace(e) {
-  index = gameBoard.gridTiles.indexOf(e.target);
-  
-  if (!(gameBoard.gameBoardArr[index] === '')) {
-    switchPlayer = false;
-    return
-  }
-
-  if (player1.currentPlayer === 'true') {
-    gameBoard.gameBoardArr[index] = player1.mark;
-    switchPlayer = true;
-  }
-  if (player2.currentPlayer === 'true') {
-    gameBoard.gameBoardArr[index] = player2.mark;
-    switchPlayer = true;
-  }
-}
-
-// PLAYS ONE ROUND OF TIC TAC TOE
-function playRound(e) {
-  markSpace(e);
-  gameBoard.render();
-  if (switchPlayer === false) {
-    return
-  } else {
-    switchCurrentPlayer();
-    isArrayFull = gameBoard.gameBoardArr.every(element => element !== '');
-    checkRoundWin();
-
-    if (gameSetIsOver === true) {
-      modal.style.display = 'block';
-      displayGameSetWinner();
-      resetValues();
-      gameModeDiv.removeEventListener('click', setGameMode)
-      mode1PlayerMarkDiv.removeEventListener('click', getMark1)
-      player1MarkDiv.removeEventListener('click', getMark2)
-      newGameBtn.removeEventListener('click', newGame);
-    }
-  }
-}
-
-// RESETS VALUES 
-function resetValues() {
-  gameMode = null;
-  gameIsOver = false;
-  gameSetIsOver = false;
-  gameBoard.gameBoardArr = ["", "", "", "", "", "", "", "", ""];
-  gameBoard.render();
-  player1Name = null;
-  player2Name = null;
-  player1Score = 0;
-  player2Score = 0;
-  player1.name = null;
-  player1.mark = null;
-  player1.winner = null;
-  player1.currentPlayer = null;
-  player2.name = null;
-  player2.mark = null;
-  player2.winner = null;
-  player2.currentPlayer = null;
-  player1NameInput.value = null;
-  player2NameInput.value = null;
-  vsPlayer.checked = false;
-  vsComputer.checked = false;
-  mode2ChoiceX.checked = false;
-  mode2ChoiceO.checked = false;
-}
-
-// DISPLAY GAME SET WINNER
-function displayGameSetWinner() {
-  if (player1.winner === true) {
-    modalDisplayWinner.textContent = `${player1.name} won the game set!` ;
-  } else if (player2.winner === true) {
-    modalDisplayWinner.textContent = `${player2.name} won the game set!` ;
-  }
-}
-
-span.onclick = function() {
-  resetAll();
-}
-
-window.onclick = function(event) {
-  if (event.target == modal) {
-    resetAll();
-  }
-}
-
-// Resets everything for a new game
-function resetAll() {
-  modal.style.display = "none";
-  newGameForm.style.display = 'flex';
-  gameModeDiv.addEventListener('click', setGameMode)
-  mode1PlayerMarkDiv.addEventListener('click', getMark1)
-  player1MarkDiv.addEventListener('click', getMark2)
+  // EVENT LISTENERS
+  gameModeDiv.addEventListener('click', setGameMode);
+  mode1PlayerMarkDiv.addEventListener('click', getMark1);
+  player1MarkDiv.addEventListener('click', getMark2);
   newGameBtn.addEventListener('click', newGame);
-  displayPlayerNames();
-  displayScores();
-  hideElement(displayWinner);
-  hideElement(vsPlayerForm);
-  hideElement(vsComputerForm);
-}
 
-
-  // CHECKS FOR WIN ON ROWS, COLUMNS AND DIAGONALS , THEN CHECKS FOR DRAW
-  function checkRoundWin() {
-    checkRows();
-    checkColumns();
-    checkDiagonals();
-    checkDraw();
-    displayScores();
+  function resetGameBoard() {
+    origBoard = ['0','1','2','3','4','5','6','7','8'];
+    render();
   }
 
-  // CHECKS IF ANY OF THE PLAYERS HAS REACHED A SCORE OF 5
-  function checkGameSetWin() {
-    console.log('fired cGSW');
-    if (player1Score === 5 || player2Score === 5) { gameSetIsOver = true };
-    if (player1Score === 5) {
-      player1.winner = true;
-      player2.winner = false;
-    } else if (player2Score === 5) {
-      player2.winner = true;
-      player1.winner = false;
+  function render() {
+    for (let i = 0; i < gridTiles.length; i++) {
+      if (origBoard[i] === 'X' || origBoard[i] === 'O') {
+        gridTiles[i].textContent = origBoard[i];
+      }
+      else gridTiles[i].textContent = '';
     }
-  }
+  } 
 
-  // CHECKS FOR THREE IDENTICAL MARKS ON GRID ROWS
-  function checkRows() {
-    if (
-      ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[1]) && (gameBoard.gameBoardArr[1] === gameBoard.gameBoardArr[2]) && (gameBoard.gameBoardArr[2] === 'X')) ||
+  function newGame() {
+    newGameForm.style.display = 'none';
+    player1.score = 0;
+    player2.score = 0;
+    gameSetOver = false;
+    gameIsOver = false;
+    resetGameBoard();
+    getPlayerNames();
+    createNewPlayers();
+    startNewRound();
+    displayInfo();
 
-      ((gameBoard.gameBoardArr[3] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[5]) && (gameBoard.gameBoardArr[5] === 'X')) ||
-
-      ((gameBoard.gameBoardArr[6] === gameBoard.gameBoardArr[7]) && (gameBoard.gameBoardArr[7] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'X'))) {
-      gameIsOver = true;
-      declareWinner('X');
-      player1.mark === 'X' ? player1Score++ : player2Score++;
-      checkGameSetWin();
-      return
-
-    } else if (
-      ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[1]) && (gameBoard.gameBoardArr[1] === gameBoard.gameBoardArr[2]) && (gameBoard.gameBoardArr[2] === 'O')) ||
-
-      ((gameBoard.gameBoardArr[3] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[5]) && (gameBoard.gameBoardArr[5] === 'O')) ||
-
-      ((gameBoard.gameBoardArr[6] === gameBoard.gameBoardArr[7]) && (gameBoard.gameBoardArr[7] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'O'))) {
-      gameIsOver = true;
-      declareWinner('O');
-      player1.mark === 'O' ? player1Score++ : player2Score++;
-      checkGameSetWin();
-      return
-
-    } else return
-  }
-
-
-  // CHECKS FOR THREE IDENTICAL MARKS ON GRID COLUMNS
-  function checkColumns() {
-    if (
-      ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[3]) && (gameBoard.gameBoardArr[3] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'X')) ||
-
-      ((gameBoard.gameBoardArr[1] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[7]) && (gameBoard.gameBoardArr[7] === 'X')) ||
-
-      ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[5]) && (gameBoard.gameBoardArr[5] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'X'))) {
-      gameIsOver = true;
-      declareWinner('X');
-      player1.mark === 'X' ? player1Score++ : player2Score++;
-      checkGameSetWin();
-      return
-
-    } else if (
-      ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[3]) && (gameBoard.gameBoardArr[3] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'O')) ||
-
-      ((gameBoard.gameBoardArr[1] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[7]) && (gameBoard.gameBoardArr[7] === 'O')) ||
-
-      ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[5]) && (gameBoard.gameBoardArr[5] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'O'))) {
-      gameIsOver = true;
-      declareWinner('O');
-      player1.mark === 'O' ? player1Score++ : player2Score++;
-      checkGameSetWin();
-      return
-
-    } else return
-  }
-
-
-  // CHECKS FOR THREE IDENTICAL MARKS ON GRID DIAGONALS
-  function checkDiagonals() {
-    if (
-      ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'X')) ||
-
-      ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'X'))) {
-      gameIsOver = true;
-      declareWinner('X');
-      player1.mark === 'X' ? player1Score++ : player2Score++;
-      checkGameSetWin();
-      return
-
-    } else if (
-      ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'O')) ||
-
-      ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'O'))) {
-      gameIsOver = true;
-      declareWinner('O');
-      player1.mark === 'O' ? player1Score++ : player2Score++;
-      checkGameSetWin();
-      return
-
-    } else return
-  }
-
-  // CHECKS FOR DRAW
-  function checkDraw() {
-    if (gameIsOver === false && isArrayFull === true) {
-      gameIsOver = true;
-      declareDraw();
+    if (gameMode === 1) {
+      gameMode1Start();
+    } else if (gameMode === 2) {
+      gameMode2Start();
     }
-  }
+  }  
 
-  // ANNOUNCES DRAW GAME ON SCREEN
-  function declareDraw() {
-    displayWinner.textContent = "It's a draw!";
-    displayWinner.classList.add('visible');
-    displayWinner.classList.remove('hidden');
-  }
-
-
-  // ANNOUNCES WINNER OF ROUND ON SCREEN
-  function declareWinner(mark) {
-    if (player1.mark === mark) {
-      displayWinner.textContent = `${player1.name} won! Congratulations!`;
-    } else if (player2.mark === mark) {
-      displayWinner.textContent = `${player2.name} won! Congratulations!`;
+  function move(e) {
+    let targetIndex = gridTiles.indexOf(e.target);
+    if (gameSetOver === true) {
+      newGame();
+      return
     }
-    showElement(displayWinner);
-  }
+    if (player1.mark === 'X' && gameIsOver === true) {
+      resetGameBoard();
+      gameIsOver = false;
+      return
+    }
+    if (player2.mark === 'X' && gameIsOver === true) {
+      resetGameBoard();
+      gameIsOver = false;
+      //CPU random move
+      let randomSpot = Math.floor(Math.random() * 10);
+      setTimeout(markSpace1, 500, player2.mark, randomSpot);
+      winning(origBoard, player2.mark);
+      return
+    }
   
+  
+    if ((origBoard[targetIndex] === 'X' || origBoard[targetIndex] === 'O') && gameIsOver === false) {
+      return
+    } else if ((origBoard[targetIndex] === 'X' || origBoard[targetIndex] === 'O') && gameIsOver === true) {
+      resetGameBoard();
+      gameIsOver = false;
+      return
+    }
+  
+    if (gameIsOver === true) {
+      resetGameBoard();
+      gameIsOver = false;
+      return
+    }
+  
+    if (player1.mark === 'X') {
+      markSpace1('X', targetIndex);
+    } else {
+      markSpace1('O', targetIndex);
+    }
+    
+    winning(origBoard, player1.mark);
+    let step = minimax(origBoard, player2.mark);
+    markSpace1(player2.mark, step.index);
+    // setTimeout(markSpace, 500, player2.mark, step.index);
+    winning(origBoard, player2.mark);
+    isGameOver();
+  
+    if (player1.score === 5 || player2.score === 5) {
+      gameIsOver = true;
+      gameSetOver = true;
+      return
+      // newGame();
+      //declare winner
+    }
+  }
+
+  function winning(board, player) {
+    if (board[0] == player && board[1] == player && board[2] == player ||
+        board[3] == player && board[4] == player && board[5] == player ||
+        board[6] == player && board[7] == player && board[8] == player ||
+        board[0] == player && board[3] == player && board[6] == player ||
+        board[1] == player && board[4] == player && board[7] == player ||
+        board[2] == player && board[5] == player && board[8] == player ||
+        board[0] == player && board[4] == player && board[8] == player ||
+        board[2] == player && board[4] == player && board[6] == player) {
+        return true;
+    } else {
+        return false;
+    }
+  }
+
+  function minimax(newBoard, player) {
+    const availSpots = emptyIndexes(newBoard);
+    
+    if (winning(newBoard, player1.mark)) {
+      return {score : -10};
+    }
+    else if (winning(newBoard, player2.mark)) {
+      return {score: 10};
+    }
+    else if (availSpots.length === 0) {
+      return {score: 0};
+    }
+    
+    const moves = [];
+    
+    for (let i = 0; i < availSpots.length; i++) {
+      const move = {};
+    
+      move.index = newBoard[availSpots[i]];
+    
+      newBoard[availSpots[i]] = player;
+    
+      if (player == player2.mark) {
+        let result = minimax(newBoard, player1.mark);
+        move.score = result.score;
+      }
+      else {
+        let result = minimax(newBoard, player2.mark);
+        move.score = result.score;
+      }
+    
+      newBoard[availSpots[i]] = move.index;
+    
+      moves.push(move);
+    }
+  
+    let bestMove;
+  
+    if (player === player2.mark) {
+      let bestScore = -10000;
+      for (let i = 0; i < moves.length; i++) {
+        if (moves[i].score > bestScore) {
+          bestScore = moves[i].score;
+          bestMove = i;
+        }
+      }
+    } else {
+      let bestScore = 10000;
+      for (let i = 0; i < moves.length; i++) {
+        if (moves[i].score < bestScore) {
+          bestScore = moves[i].score;
+          bestMove = i;
+        }
+      }
+    }
+  
+    return moves[bestMove];
+  }
+
+  function emptyIndexes(board) {
+    return board.filter(s => s !== "O" && s !== "X");
+  }
+
+  function isGameOver() {
+    if (winning(origBoard, player1.mark)) {
+      player1.score++;
+      displayScores();
+      gameIsOver = true;
+    }
+    if (winning(origBoard, player2.mark)) {
+      player2.score++;
+      displayScores();
+      gameIsOver = true;
+    }
+    if (emptyIndexes(origBoard).length === 0) {
+      gameIsOver = true;
+    }
+  }
+
+  function gameMode1Start() {
+    player1.mark === 'X' ? first2Move = 'hu' : first2Move = 'ai';
+    if (first2Move === 'ai') {
+      //CPU random move
+      let randomSpot = Math.floor(Math.random() * 10);
+      setTimeout(markSpace1, 500, player2.mark, randomSpot);
+      console.log(origBoard);
+      // markSpace(player2.mark, randomSpot);
+      grid.addEventListener('click', move)
+    } else {
+      grid.addEventListener('click', move);
+    }
+  }
+
+  function gameMode2Start() {
+    grid.addEventListener('click', playGame);
+  }
+
+  function markSpace1(mark, index) {
+    origBoard[index] = mark;
+    render();
+  }
+
+  function markSpace2(e) {
+    index = gridTiles.indexOf(e.target);
+    if (!(origBoard[index] === '')) {
+      switchPlayer = false;
+      return
+    }
+  
+    if (player1.currentPlayer === 'true') {
+      origBoard[index] = player1.mark;
+      switchPlayer = true;
+      return
+    }
+    if (player2.currentPlayer === 'true') {
+      origBoard[index] = player2.mark;
+      switchPlayer = true;
+      return
+    }
+  }
 
   // CLEARS THE GRID AND STARTS NEW ROUND
   function startNewRound() {
     gameIsOver = false;
     setCurrentPlayer();
-    gameBoard.gameBoardArr = ["", "", "", "", "", "", "", "", ""];
-    gameBoard.render();
+    if (gameMode === 2) {
+      origBoard = ["", "", "", "", "", "", "", "", ""];
+      render();
+    }
   }
 
-  // STARTS GAME
   function playGame(e) {
     if (gameIsOver === true) {
       startNewRound();
@@ -436,63 +432,41 @@ function resetAll() {
     }
   }
 
-  // EVENT LISTENERS
-  gameModeDiv.addEventListener('click', setGameMode)
+  // PLAYS ONE ROUND OF TIC TAC TOE
+  function playRound(e) {
+    markSpace2(e);
+    render();
+    if (switchPlayer === false) {
+      return
+    } else {
+      switchCurrentPlayer();
+      isArrayFull = origBoard.every(element => element !== '');
+      checkRoundWin();
 
-  mode1PlayerMarkDiv.addEventListener('click', getMark1)
+      if (gameSetIsOver === true) {
+        modal.style.display = 'block';
+        displayGameSetWinner();
+        resetValues();
+        gameModeDiv.removeEventListener('click', setGameMode)
+        mode1PlayerMarkDiv.removeEventListener('click', getMark1)
+        player1MarkDiv.removeEventListener('click', getMark2)
+        newGameBtn.removeEventListener('click', newGame);
+      }
+    }
+  }  
 
-  player1MarkDiv.addEventListener('click', getMark2)
-
-  newGameBtn.addEventListener('click', newGame)
-
-  function newGame() {
-    newGameForm.style.display = 'none';
-    getPlayerNames();
-    createNewPlayers();
-    startNewRound();
-    displayInfo();
-  }
-
+  // CHECKS FOR WIN ON ROWS, COLUMNS AND DIAGONALS , THEN CHECKS FOR DRAW
+  function checkRoundWin() {
+    isGameOver();
+    displayScores();
+  }  
+  
 
   return {
-    // markSpace,
-    // switchCurrentPlayer,
-    // startNewRound,
-    // getGameIsOver,
-    // gameSetIsOver,
-    playGame,
+    origBoard,
     player1,
     player2,
+
   }
-
-
+    
 })()
-
-
-const gameBoard = (() => {
-  let gameBoardArr = ["", "", "", "", "", "", "", "", ""];
-  let gridTiles = Array.from(document.getElementsByClassName('gridTile'));
-  let grid = document.getElementById('gameBoard');
-
-  // ASSIGNS MARKS IN GRID TILES FOR EACH ELEMENT OF THE ARRAY
-  function render() {
-     for (let i = 0; i < gridTiles.length; i++) {
-      gridTiles[i].textContent = gameBoard.gameBoardArr[i]
-    }
-    return gridTiles
-  }
-
-  // EVENT LISTENER FOR STARTING THE GAME
-  grid.addEventListener('click', game.playGame);
-
-
-  return {
-    // gameBoardArr,
-    gridTiles,
-    // grid,
-    render,
-  }
-})()
-
-
-
