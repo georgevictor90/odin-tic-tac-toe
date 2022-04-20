@@ -1,498 +1,840 @@
-const game = (() => {
+      //////////////////////
+//////// GET DOM ELEMENTS ////////
+      /////////////////////
 
-  // CREATE VARIABLES
-  let gameMode;
-  let playerMark;
-  let player1Name;
-  let player2Name;
-  let player1Mark;
-  let player2Mark;
-  let index;
-  let gameIsOver = false;
-  let gameSetIsOver = false;
-  let isArrayFull;
-  let player1Score = 0;
-  let player2Score = 0;
-  let switchPlayer;
+//GET THE PAGES
+const pages = document.querySelectorAll('.page');
+const translateAmount = 100;
+let translate = 0;
+let gameMode;
 
-  // GRAB DOM ELEMENTS
-  const newGameForm = document.getElementById('newGameForm');
-  const newGameBtn = document.getElementById('newGameBtn');
-  const displayWinner = document.getElementById('displayWinner');
-  const p1NameInfo = document.getElementById('p1NameInfo');
-  const p2NameInfo = document.getElementById('p2NameInfo');
-  const p1ScoreInfo = document.getElementById('p1ScoreInfo');
-  const p2ScoreInfo = document.getElementById('p2ScoreInfo');
-  const vsComputer = document.getElementById('vsComputer');
-  const vsComputerForm = document.getElementById('vsComputerForm');
-  const vsPlayerForm = document.getElementById('vsPlayerForm');
-  const vsPlayer = document.getElementById('vsPlayer');
-  const mode1ChoiceX = document.getElementById('X');
-  const mode1ChoiceO = document.getElementById('O');
-  const mode2ChoiceX = document.getElementById('p1-X');
-  const mode2ChoiceO = document.getElementById('p1-O');
-  const player1NameInput = document.getElementById('player1Name');
-  const player2NameInput = document.getElementById('player2Name');
-  const mode1PlayerNameInput = document.getElementById('playerName');
-  const gameModeDiv = document.getElementById('chooseMode');
-  const player1MarkDiv = document.getElementById('player1Mark');
-  const mode1PlayerMarkDiv = document.getElementById('playerMark');
-  const modal = document.getElementById("myModal");
-  const span = document.getElementsByClassName("close")[0];
-  const modalDisplayWinner = document.getElementById('modalDisplayWinner');
+//GET THE VS BUTTONS
+const vsButtons = document.querySelectorAll('.vs-button');
 
+//GET THE PLAYER MARK BUTTONS ON PAGE 2
+const p1MarkButtons = document.querySelectorAll('.p1-mark-button');
+const p2MarkButtons = document.querySelectorAll('.p2-mark-button');
 
-  // PLAYER OBJECT FACTORY FUNCTION
-  const player = (name, mark) => {
-    return {
-      name,
-      mark,
-    }
-  }
+//GET 'NEXT' BUTTON 
+const nextBtn = document.querySelector('.next');
 
-  // CREATE PLAYERS
-  const player1 = player('name', 'mark');
-  const player2 = player('name2', 'mark2');
+//GET NAME INPUTS
+const p1NameInput = document.querySelector('#p1Name');
+const p2NameInput = document.querySelector('#p2Name');
 
-  //FUNCTONS TO SHOW/HIDE ELEMENTS ON THE PAGE
-  function hideElement(el) {
-    el.classList.add('hidden');
-    el.classList.remove('visible');
-  } 
+//GET THE PLAYER INFO DISPLAY DIVS
+const p1CardName = document.querySelector('.player1-card-name');
+const p2CardName = document.querySelector('.player2-card-name');
+const p1CardMark = document.querySelector('.player1-card-mark');
+const p2CardMark = document.querySelector('.player2-card-mark');
+const p1CardScore = document.querySelector('.player1-card-score');
+const p2CardScore = document.querySelector('.player2-card-score');
 
-  function showElement(el) {
-    el.classList.add('visible');
-    el.classList.remove('hidden');
-  } 
+//GET THE PLAYER2 INFORMATION DIV
+const player2Info = document.querySelector('.player2-info');
 
-  // GAME MODE 1 MEANS SINGLE PLAYER (VS COMPUTER), GAME MODE 2 MEANS TWO PLAYERS (PLAYER VS PLAYER)
-  function setGameMode() {
-    if (vsComputer.checked) {
-      showElement(vsComputerForm);
-      hideElement(vsPlayerForm);
-      gameMode = 1;
-    }
-    if (vsPlayer.checked) {
-      showElement(vsPlayerForm);
-      hideElement(vsComputerForm);
-      gameMode = 2
-    }
-    if (!gameMode) return
-    return gameMode
-  }
+//GET GRID AND GRIDTILES
+const gridTiles = Array.from(document.getElementsByClassName('gridTile'));
+const grid = document.getElementById('gameBoard');
 
-  // GETS THE SELECTED PLAYER MARK FOR SINGLE PLAYER GAME MODE
-  function getMark1() {
-    if ((!mode1ChoiceX.checked) && (!mode1ChoiceO.checked)) return
+const winnerInfo = document.querySelector('.winner-info');
 
-    if (mode1ChoiceX.checked) {
-      playerMark = "X"
-    }
-    if (mode1ChoiceO.checked) {
-      playerMark = "O"
-    }
-  }
+////////////////////////////////
+//////// CREATE PLAYERS ////////
+///////////////////////////////
 
-  // GETS THE SELECTED PLAYER MARKS FOR 2 PLAYERS GAME MODE
-  function getMark2() {
-    if ((!mode2ChoiceX.checked) && (!mode2ChoiceO.checked)) return
-
-    if (mode2ChoiceX.checked) {
-      player1Mark = "X";
-      player2Mark = "O";
-    }
-    if (mode2ChoiceO.checked) {
-      player1Mark = "O";
-      player2Mark = "X"
-    }
-  }
-
-  // GETS THE PLAYER NAMES FROM USER INPUT VALUES
-  function getPlayerNames() {
-    if (gameMode === 2) {
-      player1Name = player1NameInput.value;
-      player2Name = player2NameInput.value;
-    }
-    if (gameMode === 1) {
-      player1Name = mode1PlayerNameInput.value;
-      player2Name = 'CPU';
-    }
-
-  }
-
-  // ASSIGNS THE PLAYER NAMES AND MARKS TO THE PLAYER OBJECTS
-  function createNewPlayers() {
-    player1.name = player1Name;
-    player1.mark = player1Mark;
-    player1.winner = false;
-    player2.name = player2Name;
-    player2.mark = player2Mark;
-    player2.winner = false;
-  }
-
-  //DISPLAYS THE PLAYER NAMES IN THE PLAYERINFO DIV
-  function displayPlayerNames() {
-    if (player1Name === null || player2Name === null) {
-      p1NameInfo.textContent = `Player1 Name: `;
-      p2NameInfo.textContent = `Player2 Name: `;
-    } else {
-      p1NameInfo.textContent = `Player1 Name: ${player1Name.toUpperCase()}`;
-      p2NameInfo.textContent = `Player2 Name: ${player2Name.toUpperCase()}`;
-    }
-  }
-
-  //DISPLAYS SCORES IN PLAYERINFO DIV
-  function displayScores() {
-    p1ScoreInfo.textContent = `Player1 Score: ${player1Score}`;
-    p2ScoreInfo.textContent = `Player2 Score: ${player2Score}`;
-  }
-
-  //DISPLAY PLAYER NAMES AND SCORES
-  function displayInfo() {
-    displayPlayerNames();
-    displayScores();
-  }
-
-  //SETS THE CURRENT PLAYER FOR THE FIRST MOVE BASED ON MARK (x starts first)
-  function setCurrentPlayer() {
-    if (player1.mark === 'X') {
-      player1.currentPlayer = 'true';
-      player2.currentPlayer = 'false';
-
-    } else if (player2.mark === 'X') {
-      player2.currentPlayer = 'true';
-      player1.currentPlayer = 'false';
-    }
-
-
-  }
-
-  // SWITCHES CURRENT PLAYER AFTER EACH TURN
-  function switchCurrentPlayer() {
-    if (player1.currentPlayer === 'true' && player2.currentPlayer === 'false') {
-      player1.currentPlayer = 'false';
-      player2.currentPlayer = 'true';
-
-    } else if (player1.currentPlayer === 'false' && player2.currentPlayer === 'true') {
-      player1.currentPlayer = 'true';
-      player2.currentPlayer = 'false';
-    }
-  }
-
-
- // CHECKS THE CURRENT PLAYER AND MARKS THE CLICKED SPACE WITH ITS MARK, THEN SWITCHES CURRENT PLAYER AND CHECK FOR WIN
- function markSpace(e) {
-  index = gameBoard.gridTiles.indexOf(e.target);
-  
-  if (!(gameBoard.gameBoardArr[index] === '')) {
-    switchPlayer = false;
-    return
-  }
-
-  if (player1.currentPlayer === 'true') {
-    gameBoard.gameBoardArr[index] = player1.mark;
-    switchPlayer = true;
-  }
-  if (player2.currentPlayer === 'true') {
-    gameBoard.gameBoardArr[index] = player2.mark;
-    switchPlayer = true;
+// PLAYER FACTORY FUNCTION
+function Player(name, mark) {
+  return {
+    name: name,
+    mark: mark,
+    score: 0,
   }
 }
 
-// PLAYS ONE ROUND OF TIC TAC TOE
-function playRound(e) {
-  markSpace(e);
-  gameBoard.render();
-  if (switchPlayer === false) {
+//CREATE PLAYER OBJECTS
+const player1 = Player();
+const player2 = Player();
+
+
+
+///////////////////////////
+//////// FUNCTIONS ////////
+///////////////////////////
+
+//SLIDE PAGE FUNCTION
+slide = (direction) => {
+  direction === 'next' ? translate -= translateAmount : translate += translateAmount;
+  pages.forEach(
+    pages => (pages.style.transform = `translateX(${translate}%)`)
+    );
+  }
+  
+//GAME MODE FUNCTION
+function setGameMode(value) {
+  gameMode = value;
+}
+
+//DISPLAY NAME AND MARK INFO IN PLAYER CARDS
+function displayNamesMarks() {
+  p1CardName.textContent = player1.name;
+  p2CardName.textContent = player2.name;
+  p1CardMark.textContent = player1.mark;
+  p2CardMark.textContent = player2.mark;
+}
+
+//DISPLAY SCORES IN PLAYER CARDS
+function displayScores() {
+  p1CardScore.textContent = `Score: ${player1.score}`;
+  p2CardScore.textContent = `Score: ${player2.score}`;
+}
+
+//PLAYER TO MAKE THE FIRST MOVE
+function setFirstMover() {
+  if (isFirstMove()) {
+    if (lastRoundWinner === undefined) {
+      player1.mark === 'X' ? currentPlayer = player1 : currentPlayer = player2;
+    } else {
+      currentPlayer = lastRoundWinner;
+    };
+  };
+};
+
+//CHECKS IF IT'S THE FIRST MOVE OF THE ROUND
+function isFirstMove() {
+  return gridTiles.every(tile => tile.textContent === '');
+};
+
+
+function isGameOver() {
+  if (player1.score == 5 || player2.score == 5) {
+    return true;
+  }
+}
+
+function newRound() {
+  resetBoard();
+  origBoard = ["0", "1", "2", "3", "4", "5", "6", "7", "8"];
+  render();
+  roundOver = false;
+}
+
+function resetBoard() {
+  gridTiles.forEach(tile => tile.textContent = '');
+}
+
+function winning(board, player) {
+  if (board[0].textContent == player.mark && board[1].textContent == player.mark && board[2].textContent == player.mark ||
+      board[3].textContent == player.mark && board[4].textContent == player.mark && board[5].textContent == player.mark ||
+      board[6].textContent == player.mark && board[7].textContent == player.mark && board[8].textContent == player.mark ||
+      board[0].textContent == player.mark && board[3].textContent == player.mark && board[6].textContent == player.mark ||
+      board[1].textContent == player.mark && board[4].textContent == player.mark && board[7].textContent == player.mark ||
+      board[2].textContent == player.mark && board[5].textContent == player.mark && board[8].textContent == player.mark ||
+      board[0].textContent == player.mark && board[4].textContent == player.mark && board[8].textContent == player.mark ||
+      board[2].textContent == player.mark && board[4].textContent == player.mark && board[6].textContent == player.mark) {
+      return true;
+  } else {
+      return false;
+  }
+}
+
+function winning1B(board, player) {
+  if (board[0] == player.mark && board[1] == player.mark && board[2] == player.mark ||
+      board[3] == player.mark && board[4] == player.mark && board[5] == player.mark ||
+      board[6] == player.mark && board[7] == player.mark && board[8] == player.mark ||
+      board[0] == player.mark && board[3] == player.mark && board[6] == player.mark ||
+      board[1] == player.mark && board[4] == player.mark && board[7] == player.mark ||
+      board[2] == player.mark && board[5] == player.mark && board[8] == player.mark ||
+      board[0] == player.mark && board[4] == player.mark && board[8] == player.mark ||
+      board[2] == player.mark && board[4] == player.mark && board[6] == player.mark) {
+      return true;
+  } else {
+      return false;
+  }
+}
+
+function checkDraw() {
+  if (gridTiles.every(tile => tile.textContent.length > 0) && winning(gridTiles, currentPlayer) === false) {
+    return true
+  } else {
+    return false
+  }
+}
+
+function switchCurrentPlayer() {
+  if (currentPlayer === player1) {
+    currentPlayer = player2;
+  } else if (currentPlayer === player2) {
+    currentPlayer = player1;
+  }
+}
+
+function setOtherPlayer() {
+  currentPlayer === player1 ? otherPlayer = player2 : otherPlayer = player1;
+}
+
+
+/////////////////////////////////
+//////// EVENT LISTENERS ////////
+/////////////////////////////////
+
+vsButtons.forEach((button) => {
+  button.addEventListener('click', function(){
+    slide('next');
+    setGameMode(button.value);
+    player2Info.style.display = 'flex';
+    if (gameMode === '1a' || gameMode === '1b') {
+      player2.name = 'CPU';
+      player2Info.style.display = 'none';
+    }
+    player1.mark = null;
+    player2.mark = null;
+    p1MarkButtons.forEach(button => {
+      button.classList.remove('active');
+    })
+    p2MarkButtons.forEach(button => {
+      button.classList.remove('active')
+    })
+  })
+})
+
+p1MarkButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    if (button.classList.contains('active')) return
+    button.classList.toggle('active');
+    player1.mark = button.value;
+    if (button.value === 'X') {
+      p1MarkButtons[1].classList.remove('active');
+      p2MarkButtons[0].classList.remove('active');
+      p2MarkButtons[1].classList.toggle('active');
+      player2.mark = p2MarkButtons[1].value;
+    }
+    if (button.value === 'O') {
+      p1MarkButtons[0].classList.remove('active');
+      p2MarkButtons[0].classList.toggle('active');
+      p2MarkButtons[1].classList.remove('active');
+      player2.mark = p2MarkButtons[0].value;
+    }
+  })
+})
+
+p2MarkButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    if (button.classList.contains('active')) return
+    button.classList.toggle('active');
+    player2.mark = button.value;
+    if (button.value === 'X') {
+      p2MarkButtons[1].classList.remove('active');
+      p1MarkButtons[0].classList.remove('active');
+      p1MarkButtons[1].classList.toggle('active');
+      player1.mark = p1MarkButtons[1].value;
+    }
+    if (button.value === 'O') {
+      p2MarkButtons[0].classList.remove('active');
+      p1MarkButtons[0].classList.toggle('active');
+      p1MarkButtons[1].classList.remove('active');
+      player1.mark = p1MarkButtons[0].value;
+    }
+  })
+})
+
+// nextBtn.addEventListener('click', () => {
+//   if (gameMode === '2') {
+//     if (p1NameInput.value.length < 1 || p2NameInput.value.length < 1) {
+//       alert("Don't forGET to write your names!");
+//       return
+//     }
+//     player1.name = p1NameInput.value;
+//     player2.name = p2NameInput.value;
+//   } else {
+//     if (p1NameInput.value.length < 1) {
+//       alert("Don't forGET to write your name!");
+//       return
+//     }
+//     player1.name = p1NameInput.value;
+//   }
+//   if (!(player1.mark) || !(player2.mark)) {
+//     alert("Please choose a mark!");
+//     return
+//   }
+//   slide('next');
+//   setFirstMover();
+//   if (!(gameMode==='2')) {
+//     easyAiMove();
+//   }
+//   displayNamesMarks();
+//   displayScores();
+//   winnerInfo.textContent = `${currentPlayer.name}'s turn!`;
+// })
+
+nextBtn.addEventListener('click', () => {
+  if (!(player1.mark) || !(player2.mark)) {
+    alert("Please choose a mark!");
+    return
+  }
+  
+  switch(gameMode) {
+    case '1a' : 
+      if (p1NameInput.value.length < 1) {
+        alert("Don't forget to write your name!");
+        return
+      }
+      player1.name = p1NameInput.value;
+
+      currentPlayer = player2;
+      easyAiMove();
+      currentPlayer = player1;
+      gridTiles.forEach(tile => {
+        tile.addEventListener('click', playMode1A)
+      });
+      break;
+    case '1b' :
+      if (p1NameInput.value.length < 1) {
+        alert("Don't forget to write your name!");
+        return
+      }
+      player1.name = p1NameInput.value;
+      
+      setFirstMover();
+      //random ai move
+      if (currentPlayer == player2) {
+        availableSpots = emptyIndexesMinimax(origBoard);
+        let index = Math.floor(Math.random() * availableSpots.length);
+        origBoard[index] = player2.mark;
+        render();
+        switchCurrentPlayer();
+      } 
+      gridTiles.forEach(tile => {
+        tile.addEventListener('click', playMode1B)
+      });
+      break;
+    case  '2' :
+
+      if (p1NameInput.value.length < 1 || p2NameInput.value.length < 1) {
+        alert("Don't forget to write your names!");
+        return
+      }
+      player1.name = p1NameInput.value;
+      player2.name = p2NameInput.value;
+
+      player1.mark === 'X' ? currentPlayer = player1 : currentPlayer = player2;
+      gridTiles.forEach(tile => {
+        tile.addEventListener('click', playMode2)
+      });
+      break;
+  }
+  slide('next');
+  displayNamesMarks();
+  displayScores();
+  winnerInfo.textContent = `${currentPlayer.name}'s turn!`;
+})
+
+
+
+//////////////////////////
+/////GAMEBOARD////////////
+//////////////////////////
+
+//DEFINE VARIABLES
+let origBoard = ["0", "1", "2", "3", "4", "5", "6", "7", "8"];
+let currentPlayer;
+let otherPlayer;
+let roundOver;
+let gameOver;
+let lastRoundWinner;
+let availableSpots;
+
+
+//EVEN LISTENER FOR GRID TILES
+// gridTiles.forEach( tile => {
+//   tile.addEventListener('click', function() {
+//     setFirstMover();
+//     if (gameOver === true) {
+//       player1.score = 0;
+//       player2.score = 0;
+//       displayScores();
+//       gameOver = false;
+//     }
+//     if (roundOver === true) {
+//       newRound();
+//       winnerInfo.textContent = `${currentPlayer.name}'s turn`;
+//       return
+//     }
+//     setOtherPlayer();
+//     if (this.textContent === 'X' || this.textContent === 'O') return
+//     winnerInfo.textContent = `${otherPlayer.name}'s turn`;
+
+//     this.textContent = currentPlayer.mark;
+
+//     if (winning(gridTiles, currentPlayer) === true) {
+//       winnerInfo.textContent = `${currentPlayer.name} won the round!`;
+//       roundOver = true; 
+//       currentPlayer.score++;
+//       displayScores();
+//       if (isGameOver() === true) {
+//         winnerInfo.textContent = `${currentPlayer.name} won the game with 5 points! CLICK THE BOARD TO PLAY AGAIN!`;
+//         gameOver = true;
+//       }
+//       lastRoundWinner = currentPlayer;
+//       return
+//     };
+
+//     if (checkDraw()) {
+//       winnerInfo.textContent = 'Draw game!';
+//       roundOver = true;
+//       return
+//     };
+
+//     switchCurrentPlayer();
+//   })
+// })
+
+// gridTiles.forEach( tile => {
+//   tile.addEventListener('click', function() {
+//     // setFirstMover();
+//     if (gameOver === true) {
+//       player1.score = 0;
+//       player2.score = 0;
+//       displayScores();
+//       gameOver = false;
+//     }
+//     if (roundOver === true) {
+//       newRound();
+//       winnerInfo.textContent = `${currentPlayer.name}'s turn`;
+//       return
+//     }
+//     setOtherPlayer();
+//     if (this.textContent === 'X' || this.textContent === 'O') return
+//     winnerInfo.textContent = `${otherPlayer.name}'s turn`;
+
+//     this.textContent = currentPlayer.mark;
+
+//     if (winning(gridTiles, currentPlayer) === true) {
+//       winnerInfo.textContent = `${currentPlayer.name} won the round!`;
+//       roundOver = true; 
+//       currentPlayer.score++;
+//       displayScores();
+//       if (isGameOver() === true) {
+//         winnerInfo.textContent = `${currentPlayer.name} won the game with 5 points! CLICK THE BOARD TO PLAY AGAIN!`;
+//         gameOver = true;
+//       }
+//       lastRoundWinner = currentPlayer;
+//       return
+//     };
+
+//     if (checkDraw()) {
+//       winnerInfo.textContent = 'Draw game!';
+//       roundOver = true;
+//       return
+//     };
+
+//     switchCurrentPlayer();
+
+//     if (!(gameMode === '2')) {
+//       if (gameMode === '1a') {
+//         easyAiMove();
+//       };
+
+//       if (gameMode === '1b') {
+//         smartAiMove();
+//       };
+//       console.log(winning(gridTiles, currentPlayer));
+//       if (winning(gridTiles, currentPlayer) === true) {
+//         console.log('winning : IT WORKS');
+//         winnerInfo.textContent = `${currentPlayer.name} won the round!`;
+//         roundOver = true; 
+//         currentPlayer.score++;
+//         displayScores();
+//         if (isGameOver() === true) {
+//           winnerInfo.textContent = `${currentPlayer.name} won the game with 5 points! CLICK THE BOARD TO PLAY AGAIN!`;
+//           gameOver = true;
+//         }
+//         lastRoundWinner = currentPlayer;
+//         return
+//       };
+
+//       if (checkDraw()) {
+//         winnerInfo.textContent = 'Draw game!';
+//         roundOver = true;
+//         return
+//       };
+
+//       // switchCurrentPlayer();
+//     }
+//   console.log(`current player: ${currentPlayer.name}`);  
+//   })
+// })
+
+function easyAiMove() {
+  // if (roundOver === true) {
+  //   newRound();
+  //   winnerInfo.textContent = `${currentPlayer.name}'s turn`;
+  //   return
+  // }
+  availableSpots = emptyIndexes(gridTiles);
+  let index = Math.floor((Math.random() * availableSpots.length));
+  availableSpots[index].textContent = player2.mark;
+
+  if (winning(gridTiles, currentPlayer) === true) {
+    endRound();
+  };
+
+  if (checkDraw()) {
+    winnerInfo.textContent = 'Draw game!';
+    roundOver = true;
+    return
+  };
+}
+
+function smartAiMove() {
+  let step = minimax(origBoard, player2.mark);
+  console.log(step);
+  origBoard[step.index] = player2.mark;
+  render();
+}
+
+function render() {
+  for (let i = 0; i < gridTiles.length; i++) {
+    if (origBoard[i] === 'X' || origBoard[i] === 'O') {
+      gridTiles[i].textContent = origBoard[i];
+    }
+    else gridTiles[i].textContent = '';
+  }
+} 
+
+function emptyIndexes(board) {
+  return board.filter(s =>  s.textContent.length == 0);
+}
+
+function emptyIndexesMinimax(board) {
+  return board.filter(s => s !== "O" && s !== "X");
+}
+
+
+// function minimax(newBoard, player) {
+//   const availableSpots = emptyIndexesMinimax(newBoard);
+  
+//   if (winning1B(newBoard, player1.mark)) {
+//     return {score : -10};
+//   }
+//   else if (winning1B(newBoard, player2.mark)) {
+//     return {score: 10};
+//   }
+//   else if (availableSpots.length === 0) {
+//     return {score: 0};
+//   }
+  
+//   const moves = [];
+  
+//   for (let i = 0; i < availableSpots.length; i++) {
+//     const move = {};
+  
+//     move.index = newBoard[availableSpots[i]];
+  
+//     newBoard[availableSpots[i]] = player;
+  
+//     if (player == player2.mark) {
+//       let result = minimax(newBoard, player1.mark);
+//       move.score = result.score;
+//     }
+//     else {
+//       let result = minimax(newBoard, player2.mark);
+//       move.score = result.score;
+//     }
+  
+//     newBoard[availableSpots[i]] = move.index;
+  
+//     moves.push(move);
+//   }
+
+//   let bestMove;
+
+//   if (player === player2.mark) {
+//     let bestScore = -10000;
+//     for (let i = 0; i < moves.length; i++) {
+//       if (moves[i].score > bestScore) {
+//         bestScore = moves[i].score;
+//         bestMove = i;
+//       }
+//     }
+//   } else {
+//     let bestScore = 10000;
+//     for (let i = 0; i < moves.length; i++) {
+//       if (moves[i].score < bestScore) {
+//         bestScore = moves[i].score;
+//         bestMove = i;
+//       }
+//     }
+//   }
+
+//   return moves[bestMove];
+// }
+
+function minimax(newBoard, player) {
+  const availableSpots = emptyIndexesMinimax(newBoard);
+  
+  if (winning1B(newBoard, player1)) {
+    return {score : -10};
+  }
+  else if (winning1B(newBoard, player2)) {
+    return {score: 10};
+  }
+  else if (availableSpots.length === 0) {
+    return {score: 0};
+  }
+  
+  const moves = [];
+  
+  for (let i = 0; i < availableSpots.length; i++) {
+    const move = {};
+  
+    move.index = newBoard[availableSpots[i]];
+  
+    newBoard[availableSpots[i]] = player;
+  
+    if (player == player2.mark) {
+      let result = minimax(newBoard, player1.mark);
+      move.score = result.score;
+    }
+    else {
+      let result = minimax(newBoard, player2.mark);
+      move.score = result.score;
+    }
+  
+    newBoard[availableSpots[i]] = move.index;
+  
+    moves.push(move);
+  }
+
+  let bestMove;
+
+  if (player === player2.mark) {
+    let bestScore = -10000;
+    for (let i = 0; i < moves.length; i++) {
+      if (moves[i].score > bestScore) {
+        bestScore = moves[i].score;
+        bestMove = i;
+      }
+    }
+  } else {
+    let bestScore = 10000;
+    for (let i = 0; i < moves.length; i++) {
+      if (moves[i].score < bestScore) {
+        bestScore = moves[i].score;
+        bestMove = i;
+      }
+    }
+  }
+
+  return moves[bestMove];
+}
+
+
+function playMode1A() {
+  console.log('started playmode1A');
+  if (gameOver === true) {
+    player1.score = 0;
+    player2.score = 0;
+    displayScores();
+    gameOver = false;
+  }
+  if (roundOver === true) {
+    newRound();
+    currentPlayer = lastRoundWinner;
+    if (lastRoundWinner === undefined) {
+      switch (player1.mark) {
+        case 'X':
+          currentPlayer = player1;
+          break;
+        case 'O':
+          currentPlayer = player2;
+          break;
+      }
+    };
+    winnerInfo.textContent = `${currentPlayer.name}'s turn`;
+    if (lastRoundWinner === player1) {
+      return
+    } else {
+      easyAiMove();
+      switchCurrentPlayer();
+      winnerInfo.textContent = `${currentPlayer.name}'s turn`;
+      return
+    }
+  }
+
+  if (this.textContent.length > 0) return
+  this.textContent = player1.mark;
+
+  if (winning(gridTiles, currentPlayer) === true) {
+    endRound();
+    return
+  };
+
+  if (checkDraw() === true) {
+    winnerInfo.textContent = 'Draw game!';
+    roundOver = true;
+    return
+  };
+
+  switchCurrentPlayer();
+  winnerInfo.textContent = `${currentPlayer.name}'s turn`;
+
+  easyAiMove();
+
+  if (roundOver === true) {
     return
   } else {
     switchCurrentPlayer();
-    isArrayFull = gameBoard.gameBoardArr.every(element => element !== '');
-    checkRoundWin();
-
-    if (gameSetIsOver === true) {
-      modal.style.display = 'block';
-      displayGameSetWinner();
-      resetValues();
-      gameModeDiv.removeEventListener('click', setGameMode)
-      mode1PlayerMarkDiv.removeEventListener('click', getMark1)
-      player1MarkDiv.removeEventListener('click', getMark2)
-      newGameBtn.removeEventListener('click', newGame);
-    }
+    winnerInfo.textContent = `${currentPlayer.name}'s turn`;
   }
 }
 
-// RESETS VALUES 
-function resetValues() {
-  gameMode = null;
-  gameIsOver = false;
-  gameSetIsOver = false;
-  gameBoard.gameBoardArr = ["", "", "", "", "", "", "", "", ""];
-  gameBoard.render();
-  player1Name = null;
-  player2Name = null;
-  player1Score = 0;
-  player2Score = 0;
-  player1.name = null;
-  player1.mark = null;
-  player1.winner = null;
-  player1.currentPlayer = null;
-  player2.name = null;
-  player2.mark = null;
-  player2.winner = null;
-  player2.currentPlayer = null;
-  player1NameInput.value = null;
-  player2NameInput.value = null;
-  vsPlayer.checked = false;
-  vsComputer.checked = false;
-  mode2ChoiceX.checked = false;
-  mode2ChoiceO.checked = false;
-}
-
-// DISPLAY GAME SET WINNER
-function displayGameSetWinner() {
-  if (player1.winner === true) {
-    modalDisplayWinner.textContent = `${player1.name} won the game set!` ;
-  } else if (player2.winner === true) {
-    modalDisplayWinner.textContent = `${player2.name} won the game set!` ;
-  }
-}
-
-span.onclick = function() {
-  resetAll();
-}
-
-window.onclick = function(event) {
-  if (event.target == modal) {
-    resetAll();
-  }
-}
-
-// Resets everything for a new game
-function resetAll() {
-  modal.style.display = "none";
-  newGameForm.style.display = 'flex';
-  gameModeDiv.addEventListener('click', setGameMode)
-  mode1PlayerMarkDiv.addEventListener('click', getMark1)
-  player1MarkDiv.addEventListener('click', getMark2)
-  newGameBtn.addEventListener('click', newGame);
-  displayPlayerNames();
-  displayScores();
-  hideElement(displayWinner);
-  hideElement(vsPlayerForm);
-  hideElement(vsComputerForm);
-}
-
-
-  // CHECKS FOR WIN ON ROWS, COLUMNS AND DIAGONALS , THEN CHECKS FOR DRAW
-  function checkRoundWin() {
-    checkRows();
-    checkColumns();
-    checkDiagonals();
-    checkDraw();
+function playMode1B() {
+  console.log('started playmode1B');
+  if (gameOver === true) {
+    player1.score = 0;
+    player2.score = 0;
     displayScores();
+    gameOver = false;
+    return
   }
+  if (roundOver === true) {
+    newRound();
+    currentPlayer = lastRoundWinner;
+    if (lastRoundWinner === undefined) {
+      switch (player1.mark) {
+        case 'X':
+          currentPlayer = player1;
+          break;
+        case 'O':
+          currentPlayer = player2;
+          break;
+        };
+        winnerInfo.textContent = `${currentPlayer.name}'s turn`;
+        return
+    };
+    winnerInfo.textContent = `${currentPlayer.name}'s turn`;
+    if (lastRoundWinner === player1) {
+      return
+    } else if (lastRoundWinner === player2) {
 
-  // CHECKS IF ANY OF THE PLAYERS HAS REACHED A SCORE OF 5
-  function checkGameSetWin() {
-    console.log('fired cGSW');
-    if (player1Score === 5 || player2Score === 5) { gameSetIsOver = true };
-    if (player1Score === 5) {
-      player1.winner = true;
-      player2.winner = false;
-    } else if (player2Score === 5) {
-      player2.winner = true;
-      player1.winner = false;
+      //random ai move
+      // availableSpots = emptyIndexesMinimax(origBoard);
+      // let index = Math.floor(Math.random() * availableSpots.length);
+      // availableSpots[index].textContent = player2.mark;
+      let randomSpot = Math.floor(Math.random() * 10);
+      origBoard[randomSpot] = player2.mark;
+      render();
+      // smartAiMove();
+      if (winning1B(origBoard, currentPlayer) === true) {
+        endRound();
+        return
+      };
+    
+      if (checkDraw() === true) {
+        winnerInfo.textContent = 'Draw game!';
+        roundOver = true;
+        return
+      };
+
+      switchCurrentPlayer();
+      winnerInfo.textContent = `${currentPlayer.name}'s turn`;
+      return
     }
   }
 
-  // CHECKS FOR THREE IDENTICAL MARKS ON GRID ROWS
-  function checkRows() {
-    if (
-      ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[1]) && (gameBoard.gameBoardArr[1] === gameBoard.gameBoardArr[2]) && (gameBoard.gameBoardArr[2] === 'X')) ||
+  if (this.textContent.length > 0) return
+  origBoard[gridTiles.indexOf(this)] = player1.mark;
+  render();
 
-      ((gameBoard.gameBoardArr[3] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[5]) && (gameBoard.gameBoardArr[5] === 'X')) ||
+  if (winning1B(origBoard, currentPlayer) === true) {
+    endRound();
+    return
+  };
 
-      ((gameBoard.gameBoardArr[6] === gameBoard.gameBoardArr[7]) && (gameBoard.gameBoardArr[7] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'X'))) {
-      gameIsOver = true;
-      declareWinner('X');
-      player1.mark === 'X' ? player1Score++ : player2Score++;
-      checkGameSetWin();
-      return
+  if (checkDraw() === true) {
+    winnerInfo.textContent = 'Draw game!';
+    roundOver = true;
+    return
+  };
 
-    } else if (
-      ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[1]) && (gameBoard.gameBoardArr[1] === gameBoard.gameBoardArr[2]) && (gameBoard.gameBoardArr[2] === 'O')) ||
+  switchCurrentPlayer();
+  winnerInfo.textContent = `${currentPlayer.name}'s turn`;
 
-      ((gameBoard.gameBoardArr[3] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[5]) && (gameBoard.gameBoardArr[5] === 'O')) ||
+  smartAiMove();
 
-      ((gameBoard.gameBoardArr[6] === gameBoard.gameBoardArr[7]) && (gameBoard.gameBoardArr[7] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'O'))) {
-      gameIsOver = true;
-      declareWinner('O');
-      player1.mark === 'O' ? player1Score++ : player2Score++;
-      checkGameSetWin();
-      return
+  if (winning1B(origBoard, currentPlayer) === true) {
+    endRound();
+    return
+  };
 
-    } else return
+  if (checkDraw() === true) {
+    winnerInfo.textContent = 'Draw game!';
+    roundOver = true;
+    return
+  };
+
+
+  if (roundOver === true) {
+    return
+  } else {
+    switchCurrentPlayer();
+    winnerInfo.textContent = `${currentPlayer.name}'s turn`;
+  }
+}
+
+function playMode2() {
+  console.log('started playmode2');
+  if (gameOver === true) {
+    player1.score = 0;
+    player2.score = 0;
+    displayScores();
+    gameOver = false;
+  }
+  if (roundOver === true) {
+    newRound();
+    currentPlayer = lastRoundWinner;
+    if (lastRoundWinner === undefined || lastRoundWinner === null) {
+      switch (player1.mark) {
+        case 'X':
+          currentPlayer = player1;
+          break;
+        case 'O':
+          currentPlayer = player2;
+          break;
+      }
+    };
+    winnerInfo.textContent = `${currentPlayer.name}'s turn`;
+    return
   }
 
+  if (this.textContent.length > 0) return
+  this.textContent = currentPlayer.mark;
+  if (winning(gridTiles, currentPlayer) === true) {
+    endRound();
+    return
+  };
 
-  // CHECKS FOR THREE IDENTICAL MARKS ON GRID COLUMNS
-  function checkColumns() {
-    if (
-      ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[3]) && (gameBoard.gameBoardArr[3] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'X')) ||
+  if (checkDraw()) {
+    winnerInfo.textContent = 'Draw game!';
+    roundOver = true;
+    lastRoundWinner = null;
+    return
+  };
+  switchCurrentPlayer();
+  winnerInfo.textContent = `${currentPlayer.name}'s turn`;
 
-      ((gameBoard.gameBoardArr[1] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[7]) && (gameBoard.gameBoardArr[7] === 'X')) ||
+}
 
-      ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[5]) && (gameBoard.gameBoardArr[5] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'X'))) {
-      gameIsOver = true;
-      declareWinner('X');
-      player1.mark === 'X' ? player1Score++ : player2Score++;
-      checkGameSetWin();
-      return
-
-    } else if (
-      ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[3]) && (gameBoard.gameBoardArr[3] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'O')) ||
-
-      ((gameBoard.gameBoardArr[1] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[7]) && (gameBoard.gameBoardArr[7] === 'O')) ||
-
-      ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[5]) && (gameBoard.gameBoardArr[5] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'O'))) {
-      gameIsOver = true;
-      declareWinner('O');
-      player1.mark === 'O' ? player1Score++ : player2Score++;
-      checkGameSetWin();
-      return
-
-    } else return
-  }
-
-
-  // CHECKS FOR THREE IDENTICAL MARKS ON GRID DIAGONALS
-  function checkDiagonals() {
-    if (
-      ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'X')) ||
-
-      ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'X'))) {
-      gameIsOver = true;
-      declareWinner('X');
-      player1.mark === 'X' ? player1Score++ : player2Score++;
-      checkGameSetWin();
-      return
-
-    } else if (
-      ((gameBoard.gameBoardArr[0] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[8]) && (gameBoard.gameBoardArr[8] === 'O')) ||
-
-      ((gameBoard.gameBoardArr[2] === gameBoard.gameBoardArr[4]) && (gameBoard.gameBoardArr[4] === gameBoard.gameBoardArr[6]) && (gameBoard.gameBoardArr[6] === 'O'))) {
-      gameIsOver = true;
-      declareWinner('O');
-      player1.mark === 'O' ? player1Score++ : player2Score++;
-      checkGameSetWin();
-      return
-
-    } else return
-  }
-
-  // CHECKS FOR DRAW
-  function checkDraw() {
-    if (gameIsOver === false && isArrayFull === true) {
-      gameIsOver = true;
-      declareDraw();
-    }
-  }
-
-  // ANNOUNCES DRAW GAME ON SCREEN
-  function declareDraw() {
-    displayWinner.textContent = "It's a draw!";
-    displayWinner.classList.add('visible');
-    displayWinner.classList.remove('hidden');
-  }
-
-
-  // ANNOUNCES WINNER OF ROUND ON SCREEN
-  function declareWinner(mark) {
-    if (player1.mark === mark) {
-      displayWinner.textContent = `${player1.name} won! Congratulations!`;
-    } else if (player2.mark === mark) {
-      displayWinner.textContent = `${player2.name} won! Congratulations!`;
-    }
-    showElement(displayWinner);
-  }
-  
-
-  // CLEARS THE GRID AND STARTS NEW ROUND
-  function startNewRound() {
-    gameIsOver = false;
-    setCurrentPlayer();
-    gameBoard.gameBoardArr = ["", "", "", "", "", "", "", "", ""];
-    gameBoard.render();
-  }
-
-  // STARTS GAME
-  function playGame(e) {
-    if (gameIsOver === true) {
-      startNewRound();
-      hideElement(displayWinner);
-    } else {
-      playRound(e);
-    }
-  }
-
-  // EVENT LISTENERS
-  gameModeDiv.addEventListener('click', setGameMode)
-
-  mode1PlayerMarkDiv.addEventListener('click', getMark1)
-
-  player1MarkDiv.addEventListener('click', getMark2)
-
-  newGameBtn.addEventListener('click', newGame)
-
-  function newGame() {
-    newGameForm.style.display = 'none';
-    getPlayerNames();
-    createNewPlayers();
-    startNewRound();
-    displayInfo();
-  }
-
-
-  return {
-    // markSpace,
-    // switchCurrentPlayer,
-    // startNewRound,
-    // getGameIsOver,
-    // gameSetIsOver,
-    playGame,
-    player1,
-    player2,
-  }
-
-
-})()
-
-
-const gameBoard = (() => {
-  let gameBoardArr = ["", "", "", "", "", "", "", "", ""];
-  let gridTiles = Array.from(document.getElementsByClassName('gridTile'));
-  let grid = document.getElementById('gameBoard');
-
-  // ASSIGNS MARKS IN GRID TILES FOR EACH ELEMENT OF THE ARRAY
-  function render() {
-     for (let i = 0; i < gridTiles.length; i++) {
-      gridTiles[i].textContent = gameBoard.gameBoardArr[i]
-    }
-    return gridTiles
-  }
-
-  // EVENT LISTENER FOR STARTING THE GAME
-  grid.addEventListener('click', game.playGame);
-
-
-  return {
-    // gameBoardArr,
-    gridTiles,
-    // grid,
-    render,
-  }
-})()
-
-
-
+function endRound() {
+    winnerInfo.textContent = `${currentPlayer.name} won the round!`;
+    roundOver = true; 
+    currentPlayer.score++;
+    displayScores();
+    if (isGameOver() === true) {
+      winnerInfo.textContent = `${currentPlayer.name} won the game with 5 points! CLICK THE BOARD TO PLAY AGAIN!`;
+      gameOver = true;
+    };
+    lastRoundWinner = currentPlayer;
+    return
+}
