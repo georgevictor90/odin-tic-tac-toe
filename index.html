@@ -32,28 +32,30 @@
 
       </div>
       <div class="page two">
-        <div class="players-info">
-          <div class="player1-info">
-            <div class="player-name">
-              <label for="p1Name">PLAYER <span class="player-number">1</span> NAME</label>
-              <input type="text" name="p1Name" id="p1Name">
+        <form action="">
+          <div class="players-info">
+            <div class="player1-info">
+              <div class="player-name">
+                <label for="p1Name">PLAYER <span class="player-number">1</span> NAME</label>
+                <input type="text" name="p1Name" id="p1Name">
+              </div>
+              <div class="player-mark">
+                <button class="player-mark-button p1-mark-button" type="button" value="X">X</button>
+                <button class="player-mark-button p1-mark-button" type="button" value="O">O</button>
+              </div>
             </div>
-            <div class="player-mark">
-              <button class="player-mark-button p1-mark-button" type="button" value="X">X</button>
-              <button class="player-mark-button p1-mark-button" type="button" value="O">O</button>
+            <div class="player2-info">
+              <div class="player-name">
+                <label for="p2Name">PLAYER 2 NAME</label>
+                <input type="text" name="p2Name" id="p2Name">
+              </div>
+              <div class="player-mark">
+                <button class="player-mark-button p2-mark-button" type="button" value="X">X</button>
+                <button class="player-mark-button p2-mark-button" type="button" value="O">O</button>
+              </div>
             </div>
           </div>
-          <div class="player2-info">
-            <div class="player-name">
-              <label for="p2Name">PLAYER 2 NAME</label>
-              <input type="text" name="p2Name" id="p2Name">
-            </div>
-            <div class="player-mark">
-              <button class="player-mark-button p2-mark-button" type="button" value="X">X</button>
-              <button class="player-mark-button p2-mark-button" type="button" value="O">O</button>
-            </div>
-          </div>
-        </div>
+        </form>
         <div class="nav-buttons">
           <button class="nav-button" type="button" onClick="slide('prev');"><i class="las la-angle-double-left"></i></button>
           <button class="nav-button next" type="button"><i class="las la-angle-double-right"></i></button>
