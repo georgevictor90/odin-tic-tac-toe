@@ -1,4 +1,5 @@
-      //////////////////////
+const game = (() => {
+//////////////////////
 //////// GET DOM ELEMENTS ////////
       /////////////////////
 
@@ -772,3 +773,4 @@ function endRound() {
     lastRoundWinner = currentPlayer;
     return
 }
+})()
