@@ -29,6 +29,8 @@ const p1CardMark = document.querySelector('.player1-card-mark');
 const p2CardMark = document.querySelector('.player2-card-mark');
 const p1CardScore = document.querySelector('.player1-card-score');
 const p2CardScore = document.querySelector('.player2-card-score');
+const p1Card = document.querySelector('.player1-card');
+const p2Card = document.querySelector('.player2-card');
 
 //GET THE PLAYER2 INFORMATION DIV
 const player2Info = document.querySelector('.player2-info');
@@ -123,6 +125,8 @@ function resetBoard() {
   gridTiles.forEach(tile => tile.textContent = '');
 }
 
+
+//CHECK FOR A WIN (THREE IN A ROW/COLUMN/DIAGONAL)
 function winning(board, player) {
   if (board[0].textContent == player.mark && board[1].textContent == player.mark && board[2].textContent == player.mark ||
       board[3].textContent == player.mark && board[4].textContent == player.mark && board[5].textContent == player.mark ||
@@ -153,6 +157,8 @@ function winning1B(board, player) {
   }
 }
 
+
+//CHECK FOR DRAW
 function checkDraw() {
   if (gridTiles.every(tile => tile.textContent.length > 0) && winning(gridTiles, currentPlayer) === false) {
     return true
@@ -161,6 +167,7 @@ function checkDraw() {
   }
 }
 
+//SWITCH CURRENT PLAYER
 function switchCurrentPlayer() {
   if (currentPlayer === player1) {
     currentPlayer = player2;
@@ -238,40 +245,15 @@ p2MarkButtons.forEach(button => {
   })
 })
 
-// nextBtn.addEventListener('click', () => {
-//   if (gameMode === '2') {
-//     if (p1NameInput.value.length < 1 || p2NameInput.value.length < 1) {
-//       alert("Don't forGET to write your names!");
-//       return
-//     }
-//     player1.name = p1NameInput.value;
-//     player2.name = p2NameInput.value;
-//   } else {
-//     if (p1NameInput.value.length < 1) {
-//       alert("Don't forGET to write your name!");
-//       return
-//     }
-//     player1.name = p1NameInput.value;
-//   }
-//   if (!(player1.mark) || !(player2.mark)) {
-//     alert("Please choose a mark!");
-//     return
-//   }
-//   slide('next');
-//   setFirstMover();
-//   if (!(gameMode==='2')) {
-//     easyAiMove();
-//   }
-//   displayNamesMarks();
-//   displayScores();
-//   winnerInfo.textContent = `${currentPlayer.name}'s turn!`;
-// })
 
 nextBtn.addEventListener('click', () => {
   if (!(player1.mark) || !(player2.mark)) {
     alert("Please choose a mark!");
     return
   }
+
+  player1.color = '#FF6F3C';
+  player2.color = '#f6cd61';
   
   switch(gameMode) {
     case '1a' : 
@@ -302,13 +284,14 @@ nextBtn.addEventListener('click', () => {
         let index = Math.floor(Math.random() * availableSpots.length);
         origBoard[index] = player2.mark;
         render();
+        gridTiles[index].style.color = player2.color;
         switchCurrentPlayer();
       } 
       gridTiles.forEach(tile => {
         tile.addEventListener('click', playMode1B)
       });
       break;
-    case  '2' :
+    case '2' :
 
       if (p1NameInput.value.length < 1 || p2NameInput.value.length < 1) {
         alert("Don't forget to write your names!");
@@ -318,6 +301,14 @@ nextBtn.addEventListener('click', () => {
       player2.name = p2NameInput.value;
 
       player1.mark === 'X' ? currentPlayer = player1 : currentPlayer = player2;
+      if (currentPlayer == player1) {
+        winnerInfo.classList.add('orange');
+        winnerInfo.classList.remove('yellow');
+      }
+      if (currentPlayer == player2) {
+        winnerInfo.classList.add('orange');
+        winnerInfo.classList.remove('yellow');
+      }
       gridTiles.forEach(tile => {
         tile.addEventListener('click', playMode2)
       });
@@ -327,6 +318,16 @@ nextBtn.addEventListener('click', () => {
   displayNamesMarks();
   displayScores();
   winnerInfo.textContent = `${currentPlayer.name}'s turn!`;
+  if (currentPlayer == player1) {
+    p1Card.classList.add('current-player');
+    p2Card.classList.remove('current-player');
+  } else if (currentPlayer == player2) {
+    p2Card.classList.add('current-player');
+    p1Card.classList.remove('current-player');
+  } else {
+    p1Card.classList.remove('current-player');
+    p2Card.classList.remove('current-player');
+  }
 })
 
 
@@ -345,135 +346,12 @@ let lastRoundWinner;
 let availableSpots;
 
 
-//EVEN LISTENER FOR GRID TILES
-// gridTiles.forEach( tile => {
-//   tile.addEventListener('click', function() {
-//     setFirstMover();
-//     if (gameOver === true) {
-//       player1.score = 0;
-//       player2.score = 0;
-//       displayScores();
-//       gameOver = false;
-//     }
-//     if (roundOver === true) {
-//       newRound();
-//       winnerInfo.textContent = `${currentPlayer.name}'s turn`;
-//       return
-//     }
-//     setOtherPlayer();
-//     if (this.textContent === 'X' || this.textContent === 'O') return
-//     winnerInfo.textContent = `${otherPlayer.name}'s turn`;
-
-//     this.textContent = currentPlayer.mark;
-
-//     if (winning(gridTiles, currentPlayer) === true) {
-//       winnerInfo.textContent = `${currentPlayer.name} won the round!`;
-//       roundOver = true; 
-//       currentPlayer.score++;
-//       displayScores();
-//       if (isGameOver() === true) {
-//         winnerInfo.textContent = `${currentPlayer.name} won the game with 5 points! CLICK THE BOARD TO PLAY AGAIN!`;
-//         gameOver = true;
-//       }
-//       lastRoundWinner = currentPlayer;
-//       return
-//     };
-
-//     if (checkDraw()) {
-//       winnerInfo.textContent = 'Draw game!';
-//       roundOver = true;
-//       return
-//     };
-
-//     switchCurrentPlayer();
-//   })
-// })
-
-// gridTiles.forEach( tile => {
-//   tile.addEventListener('click', function() {
-//     // setFirstMover();
-//     if (gameOver === true) {
-//       player1.score = 0;
-//       player2.score = 0;
-//       displayScores();
-//       gameOver = false;
-//     }
-//     if (roundOver === true) {
-//       newRound();
-//       winnerInfo.textContent = `${currentPlayer.name}'s turn`;
-//       return
-//     }
-//     setOtherPlayer();
-//     if (this.textContent === 'X' || this.textContent === 'O') return
-//     winnerInfo.textContent = `${otherPlayer.name}'s turn`;
-
-//     this.textContent = currentPlayer.mark;
-
-//     if (winning(gridTiles, currentPlayer) === true) {
-//       winnerInfo.textContent = `${currentPlayer.name} won the round!`;
-//       roundOver = true; 
-//       currentPlayer.score++;
-//       displayScores();
-//       if (isGameOver() === true) {
-//         winnerInfo.textContent = `${currentPlayer.name} won the game with 5 points! CLICK THE BOARD TO PLAY AGAIN!`;
-//         gameOver = true;
-//       }
-//       lastRoundWinner = currentPlayer;
-//       return
-//     };
-
-//     if (checkDraw()) {
-//       winnerInfo.textContent = 'Draw game!';
-//       roundOver = true;
-//       return
-//     };
-
-//     switchCurrentPlayer();
-
-//     if (!(gameMode === '2')) {
-//       if (gameMode === '1a') {
-//         easyAiMove();
-//       };
-
-//       if (gameMode === '1b') {
-//         smartAiMove();
-//       };
-//       console.log(winning(gridTiles, currentPlayer));
-//       if (winning(gridTiles, currentPlayer) === true) {
-//         console.log('winning : IT WORKS');
-//         winnerInfo.textContent = `${currentPlayer.name} won the round!`;
-//         roundOver = true; 
-//         currentPlayer.score++;
-//         displayScores();
-//         if (isGameOver() === true) {
-//           winnerInfo.textContent = `${currentPlayer.name} won the game with 5 points! CLICK THE BOARD TO PLAY AGAIN!`;
-//           gameOver = true;
-//         }
-//         lastRoundWinner = currentPlayer;
-//         return
-//       };
-
-//       if (checkDraw()) {
-//         winnerInfo.textContent = 'Draw game!';
-//         roundOver = true;
-//         return
-//       };
-
-//       // switchCurrentPlayer();
-//     }
-//   console.log(`current player: ${currentPlayer.name}`);  
-//   })
-// })
-
+// AI MOVE FOR EASY MODE
 function easyAiMove() {
-  // if (roundOver === true) {
-  //   newRound();
-  //   winnerInfo.textContent = `${currentPlayer.name}'s turn`;
-  //   return
-  // }
   availableSpots = emptyIndexes(gridTiles);
   let index = Math.floor((Math.random() * availableSpots.length));
   availableSpots[index].textContent = player2.mark;
+  availableSpots[index].style.color = currentPlayer.color;
 
   if (winning(gridTiles, currentPlayer) === true) {
     endRound();
@@ -486,13 +364,16 @@ function easyAiMove() {
   };
 }
 
+// AI MOVE FOR HARD MODE
 function smartAiMove() {
   let step = minimax(origBoard, player2.mark);
-  console.log(step);
   origBoard[step.index] = player2.mark;
   render();
+  gridTiles[step.index].style.color = player2.color;
 }
 
+
+// RENDER THE ORIGINAL BOARD TO GRIDTILES
 function render() {
   for (let i = 0; i < gridTiles.length; i++) {
     if (origBoard[i] === 'X' || origBoard[i] === 'O') {
@@ -502,74 +383,18 @@ function render() {
   }
 } 
 
+//RETURN EMPTY SPACES
 function emptyIndexes(board) {
   return board.filter(s =>  s.textContent.length == 0);
 }
 
+//RETURN EMPTY SPACES FOR MINIMAX FUNCTION
 function emptyIndexesMinimax(board) {
   return board.filter(s => s !== "O" && s !== "X");
 }
 
 
-// function minimax(newBoard, player) {
-//   const availableSpots = emptyIndexesMinimax(newBoard);
-  
-//   if (winning1B(newBoard, player1.mark)) {
-//     return {score : -10};
-//   }
-//   else if (winning1B(newBoard, player2.mark)) {
-//     return {score: 10};
-//   }
-//   else if (availableSpots.length === 0) {
-//     return {score: 0};
-//   }
-  
-//   const moves = [];
-  
-//   for (let i = 0; i < availableSpots.length; i++) {
-//     const move = {};
-  
-//     move.index = newBoard[availableSpots[i]];
-  
-//     newBoard[availableSpots[i]] = player;
-  
-//     if (player == player2.mark) {
-//       let result = minimax(newBoard, player1.mark);
-//       move.score = result.score;
-//     }
-//     else {
-//       let result = minimax(newBoard, player2.mark);
-//       move.score = result.score;
-//     }
-  
-//     newBoard[availableSpots[i]] = move.index;
-  
-//     moves.push(move);
-//   }
-
-//   let bestMove;
-
-//   if (player === player2.mark) {
-//     let bestScore = -10000;
-//     for (let i = 0; i < moves.length; i++) {
-//       if (moves[i].score > bestScore) {
-//         bestScore = moves[i].score;
-//         bestMove = i;
-//       }
-//     }
-//   } else {
-//     let bestScore = 10000;
-//     for (let i = 0; i < moves.length; i++) {
-//       if (moves[i].score < bestScore) {
-//         bestScore = moves[i].score;
-//         bestMove = i;
-//       }
-//     }
-//   }
-
-//   return moves[bestMove];
-// }
-
+//MINIMAX FUNCTION - ALGORITHM THAT CHOOSES THE BEST POSITION FOR AI PLAY
 function minimax(newBoard, player) {
   const availableSpots = emptyIndexesMinimax(newBoard);
   
@@ -629,7 +454,7 @@ function minimax(newBoard, player) {
   return moves[bestMove];
 }
 
-
+//PLAY MODE : EASY (1A), HARD (1B), 2PLAYERS (2)
 function playMode1A() {
   console.log('started playmode1A');
   if (gameOver === true) {
@@ -651,12 +476,28 @@ function playMode1A() {
           break;
       }
     };
+    if(currentPlayer == player1) {
+      winnerInfo.classList.add('orange');
+      winnerInfo.classList.remove('yellow');
+    }
+    if (currentPlayer == player2) {
+      winnerInfo.classList.remove('orange');
+      winnerInfo.classList.add('yellow');
+    }
     winnerInfo.textContent = `${currentPlayer.name}'s turn`;
     if (lastRoundWinner === player1) {
       return
     } else {
       easyAiMove();
       switchCurrentPlayer();
+      if(currentPlayer == player1) {
+        winnerInfo.classList.add('orange');
+        winnerInfo.classList.remove('yellow');
+      }
+      if (currentPlayer == player2) {
+        winnerInfo.classList.remove('orange');
+        winnerInfo.classList.add('yellow');
+      }
       winnerInfo.textContent = `${currentPlayer.name}'s turn`;
       return
     }
@@ -664,6 +505,7 @@ function playMode1A() {
 
   if (this.textContent.length > 0) return
   this.textContent = player1.mark;
+  this.style.color = currentPlayer.color;
 
   if (winning(gridTiles, currentPlayer) === true) {
     endRound();
@@ -677,6 +519,14 @@ function playMode1A() {
   };
 
   switchCurrentPlayer();
+  if(currentPlayer == player1) {
+    winnerInfo.classList.add('orange');
+    winnerInfo.classList.remove('yellow');
+  }
+  if (currentPlayer == player2) {
+    winnerInfo.classList.remove('orange');
+    winnerInfo.classList.add('yellow');
+  }
   winnerInfo.textContent = `${currentPlayer.name}'s turn`;
 
   easyAiMove();
@@ -685,6 +535,14 @@ function playMode1A() {
     return
   } else {
     switchCurrentPlayer();
+    if(currentPlayer == player1) {
+      winnerInfo.classList.add('orange');
+      winnerInfo.classList.remove('yellow');
+    }
+    if (currentPlayer == player2) {
+      winnerInfo.classList.remove('orange');
+      winnerInfo.classList.add('yellow');
+    }
     winnerInfo.textContent = `${currentPlayer.name}'s turn`;
   }
 }
@@ -710,22 +568,34 @@ function playMode1B() {
           currentPlayer = player2;
           break;
         };
+        if(currentPlayer == player1) {
+          winnerInfo.classList.add('orange');
+          winnerInfo.classList.remove('yellow');
+        }
+        if (currentPlayer == player2) {
+          winnerInfo.classList.remove('orange');
+          winnerInfo.classList.add('yellow');
+        }
         winnerInfo.textContent = `${currentPlayer.name}'s turn`;
         return
     };
+    if(currentPlayer == player1) {
+      winnerInfo.classList.add('orange');
+      winnerInfo.classList.remove('yellow');
+    }
+    if (currentPlayer == player2) {
+      winnerInfo.classList.remove('orange');
+      winnerInfo.classList.add('yellow');
+    }
     winnerInfo.textContent = `${currentPlayer.name}'s turn`;
     if (lastRoundWinner === player1) {
       return
     } else if (lastRoundWinner === player2) {
-
-      //random ai move
-      // availableSpots = emptyIndexesMinimax(origBoard);
-      // let index = Math.floor(Math.random() * availableSpots.length);
-      // availableSpots[index].textContent = player2.mark;
       let randomSpot = Math.floor(Math.random() * 10);
       origBoard[randomSpot] = player2.mark;
       render();
-      // smartAiMove();
+      gridTiles[randomSpot].style.color = player2.color;
+
       if (winning1B(origBoard, currentPlayer) === true) {
         endRound();
         return
@@ -738,6 +608,14 @@ function playMode1B() {
       };
 
       switchCurrentPlayer();
+      if(currentPlayer == player1) {
+        winnerInfo.classList.add('orange');
+        winnerInfo.classList.remove('yellow');
+      }
+      if (currentPlayer == player2) {
+        winnerInfo.classList.remove('orange');
+        winnerInfo.classList.add('yellow');
+      }
       winnerInfo.textContent = `${currentPlayer.name}'s turn`;
       return
     }
@@ -746,6 +624,7 @@ function playMode1B() {
   if (this.textContent.length > 0) return
   origBoard[gridTiles.indexOf(this)] = player1.mark;
   render();
+  this.style.color = player1.color;
 
   if (winning1B(origBoard, currentPlayer) === true) {
     endRound();
@@ -759,6 +638,14 @@ function playMode1B() {
   };
 
   switchCurrentPlayer();
+  if(currentPlayer == player1) {
+    winnerInfo.classList.add('orange');
+    winnerInfo.classList.remove('yellow');
+  }
+  if (currentPlayer == player2) {
+    winnerInfo.classList.remove('orange');
+    winnerInfo.classList.add('yellow');
+  }
   winnerInfo.textContent = `${currentPlayer.name}'s turn`;
 
   smartAiMove();
@@ -779,6 +666,14 @@ function playMode1B() {
     return
   } else {
     switchCurrentPlayer();
+    if(currentPlayer == player1) {
+      winnerInfo.classList.add('orange');
+      winnerInfo.classList.remove('yellow');
+    }
+    if (currentPlayer == player2) {
+      winnerInfo.classList.remove('orange');
+      winnerInfo.classList.add('yellow');
+    }
     winnerInfo.textContent = `${currentPlayer.name}'s turn`;
   }
 }
@@ -804,12 +699,31 @@ function playMode2() {
           break;
       }
     };
+    if (currentPlayer == player1) {
+      winnerInfo.classList.add('orange');
+      winnerInfo.classList.remove('yellow');
+    }
+    if (currentPlayer == player2) {
+      winnerInfo.classList.add('yellow');
+      winnerInfo.classList.remove('orange');
+    }
     winnerInfo.textContent = `${currentPlayer.name}'s turn`;
+    if (currentPlayer == player1) {
+      p1Card.classList.add('current-player');
+      p2Card.classList.remove('current-player');
+    } else if (currentPlayer == player2) {
+      p2Card.classList.add('current-player');
+      p1Card.classList.remove('current-player');
+    } else {
+      p1Card.classList.remove('current-player');
+      p2Card.classList.remove('current-player');
+    }
     return
   }
 
   if (this.textContent.length > 0) return
   this.textContent = currentPlayer.mark;
+  this.style.color = currentPlayer.color;
   if (winning(gridTiles, currentPlayer) === true) {
     endRound();
     return
@@ -822,10 +736,30 @@ function playMode2() {
     return
   };
   switchCurrentPlayer();
+  if(currentPlayer == player1) {
+    winnerInfo.classList.add('orange');
+    winnerInfo.classList.remove('yellow');
+  }
+  if (currentPlayer == player2) {
+    winnerInfo.classList.remove('orange');
+    winnerInfo.classList.add('yellow');
+  }
   winnerInfo.textContent = `${currentPlayer.name}'s turn`;
+  if (currentPlayer == player1) {
+    p1Card.classList.add('current-player');
+    p2Card.classList.remove('current-player');
+  } else if (currentPlayer == player2) {
+    p2Card.classList.add('current-player');
+    p1Card.classList.remove('current-player');
+  } else {
+    p1Card.classList.remove('current-player');
+    p2Card.classList.remove('current-player');
+  }
 
 }
 
+
+//END ROUND - ANNOUNCES WINNER, CHANGES SCORES
 function endRound() {
     winnerInfo.textContent = `${currentPlayer.name} won the round!`;
     roundOver = true; 
